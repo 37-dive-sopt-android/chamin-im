@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sopt.dive.MainActivity
 import com.sopt.dive.R
 import com.sopt.dive.signup.SignUpActivity
 import com.sopt.dive.ui.theme.DiveTheme
@@ -103,6 +104,10 @@ fun Greeting(modifier: Modifier = Modifier,
 {
     val context = LocalContext.current
 
+    var idText by remember(signUpId) { mutableStateOf("") }
+    var pwText by remember(signUpPw) { mutableStateOf("") }
+
+
     Column(
         modifier = modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 50.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -164,7 +169,26 @@ fun Greeting(modifier: Modifier = Modifier,
             verticalArrangement = Arrangement.SpaceEvenly
         ){
             Button(
-                onClick = { /* 클릭 시 수행될 동작 */ },
+                onClick = {
+                    if (idText == signUpId && pwText == signUpPw && signUpId.isNotEmpty()) {
+                        Toast.makeText(context, "로그인 성공! ${signUpNickname}님 환영합니다.", Toast.LENGTH_SHORT).show()
+
+                        val intent = Intent(context, MainActivity::class.java).apply{
+                            putExtra("id", signUpId)
+                            putExtra("pw", signUpPw)
+                            putExtra("nickname", signUpNickname)
+                            putExtra("drink", signUpDrink)
+                        }
+                        context.startActivity(intent)
+                        //현재 엑티비티 종료
+                        (context as? ComponentActivity)?.finish()
+
+                    } else if (signUpId.isEmpty()) {
+                        Toast.makeText(context, "먼저 회원가입을 해주세요.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "아이디 또는 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                },
                 Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
 
@@ -178,13 +202,7 @@ fun Greeting(modifier: Modifier = Modifier,
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier
                     .padding(16.dp)
-                    .clickable(onClick = {
-
-                        val intent = Intent(context, SignUpActivity::class.java).apply {
-//                            Intent.setFlags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                        context.startActivity(intent)
-                    })
+                    .clickable(onClick = onSignUpClick)
             )
 
         }

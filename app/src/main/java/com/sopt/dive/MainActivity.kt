@@ -48,15 +48,22 @@ import org.intellij.lang.annotations.JdkConstants
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val userId = intent.getStringExtra("id") ?: ""
+        val userPw = intent.getStringExtra("pw") ?: ""
+        val userNickname = intent.getStringExtra("nickname") ?: ""
+        val userDrink = intent.getStringExtra("drink") ?: ""
+
         enableEdgeToEdge()
         setContent {
             DiveTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
                     MainPage(
                         modifier = Modifier.padding(innerPadding).fillMaxSize(),
+                        userId = userId,
+                        userPw = userPw,
+                        userNickname = userNickname,
+                        userDrink = userDrink
                     )
                 }
             }
@@ -72,14 +79,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 fun MainPage(
     modifier: Modifier = Modifier,
+    userId: String = "",
+    userPw: String = "",
+    userNickname: String = "",
+    userDrink: String = ""
 ) {
 
     Column(
@@ -126,12 +131,6 @@ fun MainPage(
 
             }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DiveTheme {
-        Greeting("Android")
-    }
         }
 
         Spacer(Modifier.height(50.dp))
@@ -152,6 +151,7 @@ fun GreetingPreview() {
                 Spacer(Modifier.height(8.dp))
 
                 Text(
+                    text = userId,
                     color = Color.Gray
                 )
             }
@@ -171,6 +171,7 @@ fun GreetingPreview() {
                 Spacer(Modifier.height(8.dp))
 
                 Text(
+                    text = userPw,
                     color = Color.Gray
                 )
             }
@@ -190,6 +191,7 @@ fun GreetingPreview() {
                 Spacer(Modifier.height(8.dp))
 
                 Text(
+                    text = userNickname,
                     color = Color.Gray
                 )
             }
@@ -209,6 +211,7 @@ fun GreetingPreview() {
                 Spacer(Modifier.height(8.dp))
 
                 Text(
+                    text = userDrink,
                     color = Color.Gray
                 )
             }
