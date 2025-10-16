@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">dive</string>
+    <!-- SignUpActivity -->
+    <string name="sign_up_title">SIGN UP</string>
+    <string name="pw_label">PW</string>
+    <string name="nickname_label">NICKNAME</string>
+    <string name="alcohol_capacity_label">주량</string>
+    <string name="pw_placeholder">비밀번호를 입력해주세요</string>
+    <string name="nickname_placeholder">닉네임을 입력해주세요</string>
+    <string name="alcohol_placeholder">소주 주량을 입력해주세요</string>
+    <string name="sign_up_button">회원가입하기</string>
 </resources>
