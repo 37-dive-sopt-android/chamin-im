@@ -2,9 +2,11 @@ package com.sopt.dive.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,7 +40,28 @@ import com.sopt.dive.R
 import com.sopt.dive.signup.SignUpActivity
 import com.sopt.dive.ui.theme.DiveTheme
 
-class MainActivity : ComponentActivity() {
+class LoginActivity : ComponentActivity() {
+    // 회원가입에서 가져올 변수
+    private var signUpId by mutableStateOf("")
+    private var signUpPw by mutableStateOf("")
+    private var signUpNickname by mutableStateOf("")
+    private var signUpDrink by mutableStateOf("")
+
+
+    val signUpLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // 회원가입 성공 시 데이터 받기
+            result.data?.let { data ->
+                signUpId = data.getStringExtra("id") ?: ""
+                signUpPw = data.getStringExtra("pw") ?: ""
+                signUpNickname = data.getStringExtra("nickname") ?: ""
+                signUpDrink = data.getStringExtra("drink") ?: ""
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -46,7 +69,15 @@ class MainActivity : ComponentActivity() {
             DiveTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        modifier = Modifier.padding(innerPadding).fillMaxSize()
+                        modifier = Modifier.padding(innerPadding).fillMaxSize(),
+                        signUpId = signUpId,
+                        signUpPw = signUpPw,
+                        signUpNickname = signUpNickname,
+                        signUpDrink = signUpDrink,
+                        onSignUpClick = {
+                            val intent = Intent(this, SignUpActivity::class.java)
+                            signUpLauncher.launch(intent)
+                        }
                     )
                 }
             }
@@ -62,8 +93,14 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(modifier: Modifier = Modifier) {
-
+fun Greeting(modifier: Modifier = Modifier,
+             signUpId: String = "",
+             signUpPw: String = "",
+             signUpNickname: String = "",
+             signUpDrink : String = "",
+             onSignUpClick: ()-> Unit = {}
+)
+{
     val context = LocalContext.current
 
     Column(
@@ -86,7 +123,6 @@ fun Greeting(modifier: Modifier = Modifier) {
                 text = stringResource(R.string.id_label),
             )
 
-            var idText by remember { mutableStateOf("") }
             TextField(
                 value =  idText,
                 onValueChange = { idText = it },
@@ -106,7 +142,6 @@ fun Greeting(modifier: Modifier = Modifier) {
                 text = stringResource(R.string.password_label),
             )
 
-            var pwText by remember { mutableStateOf("") }
             TextField(
                 value =  pwText,
                 onValueChange = { pwText = it },

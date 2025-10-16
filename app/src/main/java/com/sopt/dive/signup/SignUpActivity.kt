@@ -1,7 +1,10 @@
 package com.sopt.dive.signup
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -23,10 +27,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,6 +68,8 @@ fun Preview() {
 
 @Composable
 fun SingUP(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val activity = context as? ComponentActivity
 
     // 입력값 상태 관리
     var idText by remember { mutableStateOf("") }
@@ -74,6 +82,11 @@ fun SingUP(modifier: Modifier = Modifier) {
     var pwError by remember { mutableStateOf("") }
     var nicknameError by remember { mutableStateOf("") }
     var drankError by remember { mutableStateOf("") }
+
+//    // Snackbar
+//    val scope = rememberCoroutineScope()
+//    val snackbarHostState = remember { SnackbarHostState() }
+
 
     fun validateId(id: String): Boolean {
         return when {
@@ -333,8 +346,23 @@ fun SingUP(modifier: Modifier = Modifier) {
         Button(
             onClick = {
                 if (validateAll()) { // 회원가입 성공
+                    Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
+
+                    // 데이터를 Intent에 담아서 반환
+                    val resultIntent = Intent().apply {
+                        putExtra("id", idText)
+                        putExtra("pw", pwText)
+                        putExtra("nickname", nicknameText)
+                        putExtra("drink", drankText)
+                    }
+
+                    activity?.setResult(Activity.RESULT_OK, resultIntent)
+                    activity?.finish()  // 현재 Activity 종료하고 이전 화면으로
+
+
 
                 } else {
+                    Toast.makeText(context, "회원가입 실패했습니다.", Toast.LENGTH_SHORT).show()
 
                 }
             },
