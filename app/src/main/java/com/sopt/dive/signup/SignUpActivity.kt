@@ -1,6 +1,7 @@
 package com.sopt.dive.signup
 
 import android.os.Bundle
+import android.provider.ContactsContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -43,7 +44,9 @@ class SignUpActivity : ComponentActivity() {
             DiveTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {innerPadding ->
                     SingUP(
-                        modifier = Modifier.padding(innerPadding).fillMaxSize()
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
                     )
                 }
             }
@@ -52,15 +55,131 @@ class SignUpActivity : ComponentActivity() {
 }
 
 @Preview(showBackground = true)
-@Composable fun Preview() {
+@Composable
+fun Preview() {
     SingUP(Modifier.fillMaxSize())
 }
 
 @Composable
 fun SingUP(modifier: Modifier = Modifier) {
 
+    // 입력값 상태 관리
+    var idText by remember { mutableStateOf("") }
+    var pwText by remember { mutableStateOf("") }
+    var nicknameText by remember { mutableStateOf("") }
+    var drankText by remember { mutableStateOf("") }
+
+    // 에러 메시지 상태 관리
+    var idError by remember { mutableStateOf("") }
+    var pwError by remember { mutableStateOf("") }
+    var nicknameError by remember { mutableStateOf("") }
+    var drankError by remember { mutableStateOf("") }
+
+    fun validateId(id: String): Boolean {
+        return when {
+            id.isEmpty() -> {
+                idError = "ID를 입력해주세요."
+                false
+            }
+            id.contains(" ") -> {
+                idError = "ID에는 공백을 사용할 수 없습니다."
+                false
+            }
+            id.length < 6 -> {
+                idError = "ID는 6글자 이상이어야 합니다."
+                false
+            }
+            id.length > 10 -> {
+                idError = "ID는 10글자 이하여야 합니다."
+                false
+            }
+            else -> {
+                idError = ""
+                true
+            }
+        }
+    }
+
+    fun validatePw(pw: String): Boolean {
+        return when {
+            pw.isEmpty() -> {
+                pwError = "비밀번호를 입력해주세요."
+                false
+            }
+            pw.contains(" ") -> {
+                pwError = "비밀번호에는 공백을 사용할 수 없습니다."
+                false
+            }
+            pw.length < 8 -> {
+                pwError = "PW는 8글자 이상이어야 합니다."
+                false
+            }
+            pw.length > 12 -> {
+                pwError = "PW는 12글자 이하여야 합니다."
+                false
+            }
+            else -> {
+                pwError = ""
+                true
+            }
+        }
+    }
+
+    fun validateNickname(nickname: String): Boolean {
+        return when {
+            nickname.isEmpty() -> {
+                nicknameError = "닉네임을 입력해주세요."
+                false
+            }
+            nickname.trim().isEmpty() -> {
+                nicknameError = "닉네임 공백은 사용할 수 없습니다."
+                false
+            }
+            nickname.isBlank() -> {
+                nicknameError = "닉네임은 한 글자 이상이어야 합니다."
+                false
+            }
+            else -> {
+                nicknameError = ""
+                true
+            }
+
+        }
+    }
+
+    fun validateDrink(drink: String): Boolean {
+        return when {
+
+            drink.isEmpty() -> {
+                drankError = "주량을 입력해주세요."
+                false
+            }
+            !drink.all { it.isDigit() } -> {
+                drankError = "숫자만 입력 가능합니다."
+                false
+            }
+            else -> {
+                drankError = ""
+                true
+            }
+
+        }
+    }
+
+    fun validateAll(): Boolean {
+        val isIdValid = validateId(idText)
+        val isPasswordValid = validatePw(pwText)
+        val isNicknameValid = validateNickname(nicknameText)
+        val isDrinkValid = validateDrink(drankText)
+
+        return isIdValid && isPasswordValid && isNicknameValid && isDrinkValid
+    }
+
+
     Column(
-        modifier = modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 50.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 50.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
 
     ) {
@@ -82,19 +201,32 @@ fun SingUP(modifier: Modifier = Modifier) {
                 fontSize = 25.sp,
             )
 
-            var idText by remember{ mutableStateOf("") }
             TextField(
                 value = idText,
-                onValueChange = { idText = it },
+                onValueChange = {
+                    idText = it
+                    validateId(it)
+                },
                 Modifier.fillMaxWidth(),
-                placeholder = {Text(stringResource(R.string.id_placeholder))},
+                placeholder = { Text(stringResource(R.string.id_placeholder)) },
                 singleLine = true,
+                isError = idError.isNotEmpty(),  // 에러 상태 표시 // 에러 비어있음 -> false (에러x)
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent
                 )
             )
+
+            // 에러 메시지 표시
+            if (idError.isNotEmpty()) {
+                Text(
+                    text = idError,
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 4.dp, top = 2.dp)
+                )
+            }
 
             Spacer(Modifier.height(20.dp))
 
@@ -103,19 +235,31 @@ fun SingUP(modifier: Modifier = Modifier) {
                 fontSize = 25.sp,
             )
 
-            var pwText by remember{ mutableStateOf("") }
             TextField(
                 value = pwText,
-                onValueChange = { pwText = it },
-                Modifier.fillMaxWidth(),
-                placeholder = {Text(stringResource(R.string.pw_placeholder))},
+                onValueChange = {
+                    pwText = it
+                    validatePw(it)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(stringResource(R.string.pw_placeholder)) },
                 singleLine = true,
+                isError = pwError.isNotEmpty(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent
                 )
             )
+
+            if (pwError.isNotEmpty()) {
+                Text(
+                    text = pwError,
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 4.dp, top = 2.dp)
+                )
+            }
 
             Spacer(Modifier.height(20.dp))
 
@@ -124,19 +268,32 @@ fun SingUP(modifier: Modifier = Modifier) {
                 fontSize = 25.sp,
             )
 
-            var nicknameText by remember{ mutableStateOf("") }
             TextField(
                 value = nicknameText,
-                onValueChange = { nicknameText = it },
-                Modifier.fillMaxWidth(),
-                placeholder = {Text(stringResource(R.string.nickname_placeholder))},
+                onValueChange = {
+                    nicknameText = it
+                    validateNickname(it)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(stringResource(R.string.nickname_placeholder)) },
                 singleLine = true,
+                isError = nicknameError.isNotEmpty(),
+
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent
                 )
             )
+
+            if (nicknameError.isNotEmpty()) {
+                Text(
+                    text = nicknameError,
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 4.dp, top = 2.dp)
+                )
+            }
 
             Spacer(Modifier.height(20.dp))
 
@@ -145,26 +302,41 @@ fun SingUP(modifier: Modifier = Modifier) {
                 fontSize = 25.sp,
             )
 
-            var drankText by remember{ mutableStateOf("") }
             TextField(
                 value = drankText,
-                onValueChange = { drankText = it },
+                onValueChange = {
+                    drankText = it
+                    validateDrink(it)
+                                },
                 Modifier.fillMaxWidth(),
-                placeholder = {Text(stringResource(R.string.alcohol_placeholder))},
+                placeholder = { Text(stringResource(R.string.alcohol_placeholder)) },
                 singleLine = true,
+                isError = drankError.isNotEmpty(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent
                 )
             )
+            if (drankError.isNotEmpty()) {
+                Text(
+                    text = drankError,
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 4.dp, top = 2.dp)
+                )
+            }
         }
 
         Spacer(Modifier.weight(1f))  // 남은 공간을 모두 차지
 
         Button(
             onClick = {
+                if (validateAll()) { // 회원가입 성공
 
+                } else {
+
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp)
