@@ -39,8 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sopt.dive.R
-import com.sopt.dive.login.Greeting
 import com.sopt.dive.ui.theme.DiveTheme
+import com.sopt.dive.util.KeyStorage
 
 class SignUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,11 +48,21 @@ class SignUpActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DiveTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) {innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     SingUP(
                         modifier = Modifier
                             .padding(innerPadding)
-                            .fillMaxSize()
+                            .fillMaxSize(),
+                        onSignUpSuccess = { id, pw, nickname, drink ->
+                            val resultIntent = Intent().apply {
+                                putExtra(KeyStorage.ID, id)
+                                putExtra(KeyStorage.PW, pw)
+                                putExtra(KeyStorage.NICKNAME, nickname)
+                                putExtra(KeyStorage.DRINK, drink)
+                            }
+                            setResult(Activity.RESULT_OK, resultIntent)
+                            finish()
+                        }
                     )
                 }
             }
@@ -60,16 +70,13 @@ class SignUpActivity : ComponentActivity() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    SingUP(Modifier.fillMaxSize())
-}
 
 @Composable
-fun SingUP(modifier: Modifier = Modifier) {
+fun SingUP(
+    modifier: Modifier = Modifier,
+    onSignUpSuccess: (String, String, String, String) -> Unit = { _, _, _, _ -> }
+) {
     val context = LocalContext.current
-    val activity = context as? ComponentActivity
 
     // 입력값 상태 관리
     var idText by remember { mutableStateOf("") }
@@ -83,29 +90,23 @@ fun SingUP(modifier: Modifier = Modifier) {
     var nicknameError by remember { mutableStateOf("") }
     var drankError by remember { mutableStateOf("") }
 
-//    // Snackbar
-//    val scope = rememberCoroutineScope()
-//    val snackbarHostState = remember { SnackbarHostState() }
-
-
-    fun validateId(id: String): Boolean {
+    fun isValidId(id: String): Boolean {
         return when {
             id.isEmpty() -> {
                 idError = "ID를 입력해주세요."
                 false
             }
+
             id.contains(" ") -> {
                 idError = "ID에는 공백을 사용할 수 없습니다."
                 false
             }
-            id.length < 6 -> {
-                idError = "ID는 6글자 이상이어야 합니다."
+
+            id.length !in 6..10 -> {
+                idError = "Id는 6 ~ 10글자 사이여야 합니다."
                 false
             }
-            id.length > 10 -> {
-                idError = "ID는 10글자 이하여야 합니다."
-                false
-            }
+
             else -> {
                 idError = ""
                 true
@@ -113,24 +114,23 @@ fun SingUP(modifier: Modifier = Modifier) {
         }
     }
 
-    fun validatePw(pw: String): Boolean {
+    fun isValidPassword(pw: String): Boolean {
         return when {
             pw.isEmpty() -> {
                 pwError = "비밀번호를 입력해주세요."
                 false
             }
+
             pw.contains(" ") -> {
                 pwError = "비밀번호에는 공백을 사용할 수 없습니다."
                 false
             }
-            pw.length < 8 -> {
-                pwError = "PW는 8글자 이상이어야 합니다."
+
+            pw.length !in 8..12 -> {
+                pwError = "PW는 8 ~ 12글자 사이여야 합니다."
                 false
             }
-            pw.length > 12 -> {
-                pwError = "PW는 12글자 이하여야 합니다."
-                false
-            }
+
             else -> {
                 pwError = ""
                 true
@@ -138,39 +138,38 @@ fun SingUP(modifier: Modifier = Modifier) {
         }
     }
 
-    fun validateNickname(nickname: String): Boolean {
+    fun isValidNickname(nickname: String): Boolean {
         return when {
             nickname.isEmpty() -> {
                 nicknameError = "닉네임을 입력해주세요."
                 false
             }
-            nickname.trim().isEmpty() -> {
-                nicknameError = "닉네임 공백은 사용할 수 없습니다."
+
+            nickname.isBlank() || nickname.contains(" ") -> {
+                nicknameError = "닉네임에 공백을 사용할 수 없습니다."
                 false
             }
-            nickname.isBlank() -> {
-                nicknameError = "닉네임은 한 글자 이상이어야 합니다."
-                false
-            }
+
             else -> {
                 nicknameError = ""
                 true
             }
-
         }
     }
 
-    fun validateDrink(drink: String): Boolean {
+    fun isValidDrink(drink: String): Boolean {
         return when {
 
             drink.isEmpty() -> {
                 drankError = "주량을 입력해주세요."
                 false
             }
+
             !drink.all { it.isDigit() } -> {
                 drankError = "숫자만 입력 가능합니다."
                 false
             }
+
             else -> {
                 drankError = ""
                 true
@@ -179,14 +178,10 @@ fun SingUP(modifier: Modifier = Modifier) {
         }
     }
 
-    fun validateAll(): Boolean {
-        val isIdValid = validateId(idText)
-        val isPasswordValid = validatePw(pwText)
-        val isNicknameValid = validateNickname(nicknameText)
-        val isDrinkValid = validateDrink(drankText)
-
-        return isIdValid && isPasswordValid && isNicknameValid && isDrinkValid
-    }
+    fun validateAll() =
+        isValidId(idText) && isValidPassword(pwText) && isValidNickname(nicknameText) && isValidDrink(
+            drankText
+        )
 
 
     Column(
@@ -194,7 +189,6 @@ fun SingUP(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 50.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-
     ) {
         Text(
             text = stringResource(R.string.sign_up_title),
@@ -218,7 +212,7 @@ fun SingUP(modifier: Modifier = Modifier) {
                 value = idText,
                 onValueChange = {
                     idText = it
-                    validateId(it)
+                    isValidId(it)
                 },
                 Modifier.fillMaxWidth(),
                 placeholder = { Text(stringResource(R.string.id_placeholder)) },
@@ -252,7 +246,7 @@ fun SingUP(modifier: Modifier = Modifier) {
                 value = pwText,
                 onValueChange = {
                     pwText = it
-                    validatePw(it)
+                    isValidPassword(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(stringResource(R.string.pw_placeholder)) },
@@ -285,7 +279,7 @@ fun SingUP(modifier: Modifier = Modifier) {
                 value = nicknameText,
                 onValueChange = {
                     nicknameText = it
-                    validateNickname(it)
+                    isValidNickname(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(stringResource(R.string.nickname_placeholder)) },
@@ -319,8 +313,8 @@ fun SingUP(modifier: Modifier = Modifier) {
                 value = drankText,
                 onValueChange = {
                     drankText = it
-                    validateDrink(it)
-                                },
+                    isValidDrink(it)
+                },
                 Modifier.fillMaxWidth(),
                 placeholder = { Text(stringResource(R.string.alcohol_placeholder)) },
                 singleLine = true,
@@ -348,22 +342,10 @@ fun SingUP(modifier: Modifier = Modifier) {
                 if (validateAll()) { // 회원가입 성공
                     Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
 
-                    // 데이터를 Intent에 담아서 반환
-                    val resultIntent = Intent().apply {
-                        putExtra("id", idText)
-                        putExtra("pw", pwText)
-                        putExtra("nickname", nicknameText)
-                        putExtra("drink", drankText)
-                    }
-
-                    activity?.setResult(Activity.RESULT_OK, resultIntent)
-                    activity?.finish()  // 현재 Activity 종료하고 이전 화면으로
-
-
+                    onSignUpSuccess(idText, pwText, nicknameText, drankText)
 
                 } else {
                     Toast.makeText(context, "회원가입 실패했습니다.", Toast.LENGTH_SHORT).show()
-
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -372,4 +354,10 @@ fun SingUP(modifier: Modifier = Modifier) {
             Text(stringResource(R.string.sign_up_button))
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Preview() {
+    SingUP(Modifier.fillMaxSize())
 }

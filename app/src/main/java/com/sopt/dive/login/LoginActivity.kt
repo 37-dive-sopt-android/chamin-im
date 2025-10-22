@@ -42,6 +42,7 @@ import com.sopt.dive.MainActivity
 import com.sopt.dive.R
 import com.sopt.dive.signup.SignUpActivity
 import com.sopt.dive.ui.theme.DiveTheme
+import com.sopt.dive.util.KeyStorage
 
 class LoginActivity : ComponentActivity() {
     // 회원가입에서 가져올 변수
@@ -57,10 +58,10 @@ class LoginActivity : ComponentActivity() {
         if (result.resultCode == RESULT_OK) {
             // 회원가입 성공 시 데이터 받기
             result.data?.let { data ->
-                signUpId = data.getStringExtra("id") ?: ""
-                signUpPw = data.getStringExtra("pw") ?: ""
-                signUpNickname = data.getStringExtra("nickname") ?: ""
-                signUpDrink = data.getStringExtra("drink") ?: ""
+                signUpId = data.getStringExtra(KeyStorage.ID) ?: ""
+                signUpPw = data.getStringExtra(KeyStorage.PW) ?: ""
+                signUpNickname = data.getStringExtra(KeyStorage.NICKNAME) ?: ""
+                signUpDrink = data.getStringExtra(KeyStorage.DRINK) ?: ""
             }
         }
     }
@@ -71,7 +72,7 @@ class LoginActivity : ComponentActivity() {
         setContent {
             DiveTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
+                    Login(
                         modifier = Modifier.padding(innerPadding).fillMaxSize(),
                         signUpId = signUpId,
                         signUpPw = signUpPw,
@@ -80,6 +81,36 @@ class LoginActivity : ComponentActivity() {
                         onSignUpClick = {
                             val intent = Intent(this, SignUpActivity::class.java)
                             signUpLauncher.launch(intent)
+                        },
+                        onLoginSuccess = {
+                            Toast.makeText(
+                                this,
+                                "로그인 성공! ${signUpNickname}님 환영합니다.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            val intent = Intent(this, MainActivity::class.java).apply {
+                                putExtra(KeyStorage.ID, signUpId)
+                                putExtra(KeyStorage.PW, signUpPw)
+                                putExtra(KeyStorage.NICKNAME, signUpNickname)
+                                putExtra(KeyStorage.DRINK, signUpDrink)
+                            }
+                            startActivity(intent)
+                            finish()
+                        },
+                        onNeedSignUp = {
+                            Toast.makeText(
+                                this,
+                                "먼저 회원가입을 해주세요.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        onLoginFailure = {
+                            Toast.makeText(
+                                this,
+                                "아이디 또는 비밀번호가 일치하지 않습니다.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     )
                 }
@@ -90,18 +121,18 @@ class LoginActivity : ComponentActivity() {
 
 
 
-@Preview(showBackground = true)
-@Composable fun Preview() {
-    Greeting(Modifier.fillMaxSize())
-}
+
 
 @Composable
-fun Greeting(modifier: Modifier = Modifier,
+fun Login(modifier: Modifier = Modifier,
              signUpId: String = "",
              signUpPw: String = "",
              signUpNickname: String = "",
              signUpDrink : String = "",
-             onSignUpClick: ()-> Unit = {}
+             onSignUpClick: ()-> Unit = {},
+          onLoginSuccess: ()-> Unit = {},
+          onNeedSignUp:()-> Unit = {},
+          onLoginFailure:()-> Unit = {}
 )
 {
     val context = LocalContext.current
@@ -109,6 +140,12 @@ fun Greeting(modifier: Modifier = Modifier,
     var idText by remember(signUpId) { mutableStateOf("") }
     var pwText by remember(signUpPw) { mutableStateOf("") }
 
+    // 로그인 유효성
+    fun isLoginSuccessful(): Boolean {
+        return idText == signUpId &&
+                pwText == signUpPw &&
+                signUpId.isNotEmpty()
+    }
 
     Column(
         modifier = modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 50.dp),
@@ -121,7 +158,7 @@ fun Greeting(modifier: Modifier = Modifier,
         )
 
         Spacer(Modifier.height(50.dp))
-        
+
         Column(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.SpaceEvenly
@@ -156,13 +193,12 @@ fun Greeting(modifier: Modifier = Modifier,
                 placeholder = { Text(stringResource(R.string.pw_placeholder)) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
-                        colors = TextFieldDefaults.colors(
+                colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,      // 포커스 시
                     unfocusedContainerColor = Color.Transparent,    // 포커스 해제 시
                     disabledContainerColor = Color.Transparent,     // 비활성 시
                 )
             )
-
         }
 
         Spacer(Modifier.weight(1f))  // 남은 공간을 모두 차지
@@ -173,23 +209,12 @@ fun Greeting(modifier: Modifier = Modifier,
         ){
             Button(
                 onClick = {
-                    if (idText == signUpId && pwText == signUpPw && signUpId.isNotEmpty()) {
-                        Toast.makeText(context, "로그인 성공! ${signUpNickname}님 환영합니다.", Toast.LENGTH_SHORT).show()
-
-                        val intent = Intent(context, MainActivity::class.java).apply{
-                            putExtra("id", signUpId)
-                            putExtra("pw", signUpPw)
-                            putExtra("nickname", signUpNickname)
-                            putExtra("drink", signUpDrink)
-                        }
-                        context.startActivity(intent)
-                        //현재 엑티비티 종료
-                        (context as? ComponentActivity)?.finish()
-
+                    if (isLoginSuccessful()) {
+                        onLoginSuccess()
                     } else if (signUpId.isEmpty()) {
-                        Toast.makeText(context, "먼저 회원가입을 해주세요.", Toast.LENGTH_SHORT).show()
+                        onNeedSignUp()
                     } else {
-                        Toast.makeText(context, "아이디 또는 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
+                        onLoginFailure()
                     }
                 },
                 Modifier.fillMaxWidth(),
@@ -209,7 +234,11 @@ fun Greeting(modifier: Modifier = Modifier,
             )
 
         }
-
     }
+}
 
+@Preview(showBackground = true)
+@Composable
+private fun Preview() {
+    Login(Modifier.fillMaxSize())
 }

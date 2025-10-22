@@ -43,16 +43,17 @@ import com.sopt.dive.signup.SignUpActivity
 import com.sopt.dive.ui.theme.DiveTheme
 import com.sopt.dive.ui.theme.Teel200
 import com.sopt.dive.ui.theme.Teel700
+import com.sopt.dive.util.KeyStorage
 import org.intellij.lang.annotations.JdkConstants
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val userId = intent.getStringExtra("id") ?: ""
-        val userPw = intent.getStringExtra("pw") ?: ""
-        val userNickname = intent.getStringExtra("nickname") ?: ""
-        val userDrink = intent.getStringExtra("drink") ?: ""
+        val userId = intent.getStringExtra(KeyStorage.ID) ?: ""
+        val userPw = intent.getStringExtra(KeyStorage.PW) ?: ""
+        val userNickname = intent.getStringExtra(KeyStorage.NICKNAME) ?: ""
+        val userDrink = intent.getStringExtra(KeyStorage.DRINK) ?: ""
 
         enableEdgeToEdge()
         setContent {
@@ -73,34 +74,28 @@ class MainActivity : ComponentActivity() {
 
 
 
-@Preview(showBackground = true)
-@Composable fun Preview() {
-    MainPage(Modifier.fillMaxSize())
-}
-
 @Composable
 fun MainPage(
     modifier: Modifier = Modifier,
-    userId: String = "",
-    userPw: String = "",
-    userNickname: String = "",
-    userDrink: String = ""
+    userId: String,
+    userPw: String,
+    userNickname: String,
+    userDrink: String
 ) {
 
     Column(
-        modifier = modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 50.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 50.dp),
     )
     {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .background(Teel200)
                 .padding(16.dp)
-
-
         ) {
             // 이미지
             Image(
@@ -113,24 +108,19 @@ fun MainPage(
 
             Column(
                 horizontalAlignment = Alignment.Start,
-
                 ) {
-
                 // 이름
                 Text(
                     text = "임차민",
                     fontWeight = FontWeight.Bold
                 )
 
-
                 //자기소개
                 Text(
                     text = "37기 안드로이드 YB 입니다!!",
                     color = Teel700
                 )
-
             }
-
         }
 
         Spacer(Modifier.height(50.dp))
@@ -217,6 +207,16 @@ fun MainPage(
             }
         }
     }
+}
 
-
+@Preview(showBackground = true)
+@Composable
+private fun Preview() {
+    MainPage(
+        modifier = Modifier.fillMaxSize(),
+        userId = "testId",
+        userPw = "testPassword",
+        userNickname = "테스트차민",
+        userDrink = "1"
+    )
 }
