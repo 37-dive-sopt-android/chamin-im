@@ -19,7 +19,7 @@ import com.sopt.dive.component.info.InfoItem
 import com.sopt.dive.ui.theme.DiveTheme
 import com.sopt.dive.util.KeyStorage
 
-class MainActivity : ComponentActivity() {
+class MyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DiveTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen(
+                    MyScreen(
                         modifier = Modifier
                             .padding(innerPadding)
                             .fillMaxSize(),
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MainScreen(
+fun MyScreen(
     modifier: Modifier = Modifier,
     userId: String,
     userPw: String,
@@ -126,9 +126,9 @@ private fun UserInfoSection(
 
 @Preview(showBackground = true)
 @Composable
-private fun MainScreenPreview() {
+private fun MyScreenPreview() {
     DiveTheme {
-        MainScreen(
+        MyScreen(
             modifier = Modifier.fillMaxSize(),
             userId = "testId",
             userPw = "testPassword",
