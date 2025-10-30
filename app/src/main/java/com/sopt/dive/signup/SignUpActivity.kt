@@ -179,9 +179,7 @@ fun SingUP(
     }
 
     fun validateAll() =
-        isValidId(idText) && isValidPassword(pwText) && isValidNickname(nicknameText) && isValidDrink(
-            drankText
-        )
+        isValidId(idText) && isValidPassword(pwText) && isValidNickname(nicknameText) && isValidDrink(drankText)
 
 
     Column(
