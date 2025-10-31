@@ -1,4 +1,4 @@
-package com.sopt.dive
+package com.sopt.dive.my
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sopt.dive.R
 import com.sopt.dive.component.card.ProfileCard
 import com.sopt.dive.component.info.InfoItem
 import com.sopt.dive.ui.theme.DiveTheme

@@ -43,7 +43,7 @@ fun ProfileCard(
         Image(
             painter = painterResource(profileImageRes),
             contentDescription = "프로필 이미지",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(100.dp).clip(RoundedCornerShape(12.dp))
         )
 
         Spacer(Modifier.width(20.dp))
@@ -73,7 +73,7 @@ private fun ProfileCardPreview() {
         ProfileCard(
             name = "임차민",
             description = "37기 안드로이드 YB 입니다!!",
-            profileImageRes = R.drawable.profile_image,
+            profileImageRes = R.drawable.chamin_profile_image,
             modifier = Modifier.padding(16.dp)
         )
     }
