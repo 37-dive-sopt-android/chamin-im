@@ -1,4 +1,4 @@
-package com.sopt.dive.main
+package com.sopt.dive
 
 import android.content.Intent
 import android.os.Bundle
@@ -24,20 +24,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import com.sopt.dive.home.HomeScreen
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.sopt.dive.login.LoginActivity
-import com.sopt.dive.my.MyScreen
-import com.sopt.dive.search.SearchScreen
+import com.sopt.dive.main.BottomNavigationBar
+import com.sopt.dive.navigation.DiveNavHost
+import com.sopt.dive.navigation.Home
+import com.sopt.dive.navigation.MyPage
+import com.sopt.dive.navigation.Search
 import com.sopt.dive.ui.theme.DiveTheme
 import com.sopt.dive.ui.theme.Teel200
 import com.sopt.dive.ui.theme.Teel700
 import com.sopt.dive.util.KeyStorage
 
-data class BottomNavItem(
-    val title: String,
-    val icon: ImageVector
-)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,82 +57,33 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DiveTheme {
-                MainScreen(
-                    userId = userId,
-                    userPw = userPw,
-                    userNickname = userNickname,
-                    userDrink = userDrink
-                )
-            }
-        }
-    }
-}
+                val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
 
-@Composable
-fun MainScreen(
-    userId: String,
-    userPw: String,
-    userNickname: String,
-    userDrink: String
-) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
-
-    val navItems = listOf(
-        BottomNavItem("Home", Icons.Default.Home),
-        BottomNavItem("Search", Icons.Default.Search),
-        BottomNavItem("My", Icons.Default.Person)
-    )
-
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            NavigationBar(
-                containerColor = Teel200,
-                contentColor = Teel700
-            ) {
-                navItems.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selectedIndex == index,
-                        onClick = { selectedIndex = index },
-                        icon = {
-                            Icon(
-                                imageVector = item.icon,
-                                contentDescription = item.title
-                            )
-                        },
-                        label = { Text(item.title) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Teel700,
-                            selectedTextColor = Teel700,
-                            unselectedIconColor = Color.Gray,
-                            unselectedTextColor = Color.Gray,
-                            indicatorColor = Color.White
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        BottomNavigationBar(
+                            navController = navController,
+                            currentRoute = currentRoute,
+                            userId = userId,
+                            userPw = userPw,
+                            userNickname = userNickname,
+                            userDrink = userDrink
                         )
+                    }
+                ) { innerPadding ->
+                    DiveNavHost(
+                        navController = navController,
+                        paddingValues = innerPadding,
+                        userId = userId,
+                        userPw = userPw,
+                        userNickname = userNickname,
+                        userDrink = userDrink
                     )
                 }
             }
-        }
-    ) { innerPadding ->
-        when (selectedIndex) {
-            0 -> HomeScreen(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-            )
-            1 -> SearchScreen(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-            )
-            2 -> MyScreen(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-                userId = userId,
-                userPw = userPw,
-                userNickname = userNickname,
-                userDrink = userDrink
-            )
         }
     }
 }

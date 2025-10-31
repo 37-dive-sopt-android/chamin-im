@@ -14,7 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.sopt.dive.main.MainActivity
+import com.sopt.dive.MainActivity
 import com.sopt.dive.signup.SignUpActivity
 import com.sopt.dive.ui.theme.DiveTheme
 import com.sopt.dive.util.KeyStorage

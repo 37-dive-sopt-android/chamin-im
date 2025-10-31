@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -81,17 +82,24 @@ val comments = listOf(
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    paddingValues: PaddingValues,
+    userId: String,
+    nickname: String,
+    modifier: Modifier = Modifier,
+    onNavigateToSearch: () -> Unit = {},
+    onNavigateToMy: () -> Unit = {}
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(paddingValues),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // 프로필 카드
         item {
             ProfileCard(
-                name = "임차민",
+                name = nickname,
                 description = "37기 안드로이드 YB 입니다!!",
                 profileImageRes = R.drawable.chamin_profile_image
             )
@@ -115,5 +123,10 @@ fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreen(Modifier.fillMaxSize())
+    HomeScreen(
+        paddingValues = PaddingValues(0.dp),
+        userId = "chamin",
+        nickname = "임차민",
+        modifier = Modifier.fillMaxSize()
+    )
 }

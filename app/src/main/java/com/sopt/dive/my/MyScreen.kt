@@ -1,15 +1,11 @@
 package com.sopt.dive.my
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,56 +14,28 @@ import com.sopt.dive.R
 import com.sopt.dive.component.card.ProfileCard
 import com.sopt.dive.component.info.InfoItem
 import com.sopt.dive.ui.theme.DiveTheme
-import com.sopt.dive.util.KeyStorage
-
-class MyActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val userId = intent.getStringExtra(KeyStorage.ID) ?: ""
-        val userPw = intent.getStringExtra(KeyStorage.PW) ?: ""
-        val userNickname = intent.getStringExtra(KeyStorage.NICKNAME) ?: ""
-        val userDrink = intent.getStringExtra(KeyStorage.DRINK) ?: ""
-
-        enableEdgeToEdge()
-        setContent {
-            DiveTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MyScreen(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize(),
-                        userId = userId,
-                        userPw = userPw,
-                        userNickname = userNickname,
-                        userDrink = userDrink
-                    )
-                }
-            }
-        }
-    }
-}
-
 
 
 @Composable
 fun MyScreen(
-    modifier: Modifier = Modifier,
+    paddingValues: PaddingValues,
     userId: String,
     userPw: String,
-    userNickname: String,
-    userDrink: String
+    nickname: String,
+    drink: String,
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {},
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()
+            .padding(paddingValues)
             .padding(horizontal = 20.dp, vertical = 50.dp),
     )
     {
         // 프로필 카드
         ProfileCard(
-            name = "임차민",
+            name = nickname,
             description = "37기 안드로이드 YB 입니다!!",
             profileImageRes = R.drawable.profile_image
         )
@@ -78,8 +46,8 @@ fun MyScreen(
         UserInfoSection(
             userId = userId,
             userPw = userPw,
-            userNickname = userNickname,
-            userDrink = userDrink
+            userNickname = nickname,
+            userDrink = drink
         )
     }
 }
@@ -99,9 +67,8 @@ private fun UserInfoSection(
             value = userId
         )
 
-            Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
-        // PW
         InfoItem(
             label = "PW",
             value = userPw
@@ -120,7 +87,7 @@ private fun UserInfoSection(
         // 주량
         InfoItem(
             label = "주량",
-            value = userDrink
+            value = if (userDrink.isNotEmpty()) "${userDrink}병" else "-"
         )
     }
 }
@@ -130,11 +97,11 @@ private fun UserInfoSection(
 private fun MyScreenPreview() {
     DiveTheme {
         MyScreen(
-            modifier = Modifier.fillMaxSize(),
+            paddingValues = PaddingValues(0.dp),
             userId = "testId",
             userPw = "testPassword",
-            userNickname = "테스트차민",
-            userDrink = "1"
+            nickname = "테스트차민",
+            drink = "1"
         )
     }
 }
