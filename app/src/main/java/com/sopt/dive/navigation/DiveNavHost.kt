@@ -3,7 +3,6 @@ package com.sopt.dive.navigation
 import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,7 +11,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.sopt.dive.home.HomeScreen
 import com.sopt.dive.login.LoginScreen
 import com.sopt.dive.my.MyScreen
@@ -23,6 +21,10 @@ import com.sopt.dive.signup.SignUpScreen
 fun DiveNavHost(
     navController: NavHostController,
     paddingValues: PaddingValues,
+    userId: String,
+    userPw: String,
+    userNickname: String,
+    userDrink: String,
     onUserInfoChanged: (String, String, String, String) -> Unit
 ) {
     val context = LocalContext.current
@@ -54,9 +56,7 @@ fun DiveNavHost(
                     // 사용자 정보 업데이트
                     onUserInfoChanged(signUpId, signUpPw, signUpNickname, signUpDrink)
 
-                    navController.navigate(
-                        Home(userId = signUpId, nickname = signUpNickname)
-                    ) {
+                    navController.navigate(Home) {
                         popUpTo(Login) { inclusive = true }
                     }
                 },
@@ -93,13 +93,11 @@ fun DiveNavHost(
             )
         }
 
-        composable<Home> { backStackEntry ->
-            val homeRoute = backStackEntry.toRoute<Home>()
-
+        composable<Home> {
             HomeScreen(
                 paddingValues = paddingValues,
-                userId = homeRoute.userId,
-                nickname = homeRoute.nickname
+                userId = userId,
+                nickname = userNickname
             )
         }
 
@@ -109,15 +107,13 @@ fun DiveNavHost(
             )
         }
 
-        composable<MyPage> { backStackEntry ->
-            val myPageRoute = backStackEntry.toRoute<MyPage>()
-
+        composable<MyPage> {
             MyScreen(
                 paddingValues = paddingValues,
-                userId = myPageRoute.userId,
-                userPw = myPageRoute.userPw,
-                nickname = myPageRoute.nickname,
-                drink = myPageRoute.drink
+                userId = userId,
+                userPw = userPw,
+                nickname = userNickname,
+                drink = userDrink
             )
         }
     }

@@ -1,4 +1,4 @@
-package com.sopt.dive
+package com.sopt.dive.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,15 +11,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.sopt.dive.main.BottomNavigationBar
 import com.sopt.dive.navigation.DiveNavHost
-import com.sopt.dive.navigation.Home
-import com.sopt.dive.navigation.MyPage
-import com.sopt.dive.navigation.Search
 import com.sopt.dive.ui.theme.DiveTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +26,7 @@ class MainActivity : ComponentActivity() {
             DiveTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination: NavDestination? = navBackStackEntry?.destination // stirng 대신 객체 가져오게
+                val currentDestination = navBackStackEntry?.destination
 
                 // 사용자 정보를 저장할 상태
                 var currentUserId by remember { mutableStateOf("") }
@@ -40,8 +35,8 @@ class MainActivity : ComponentActivity() {
                 var currentUserDrink by remember { mutableStateOf("") }
 
                 val showBottomBar = currentDestination?.let { destination ->
-                    listOf(Home::class, Search::class, MyPage::class).any { tabClass ->
-                        destination.hasRoute(tabClass)
+                    MainTab.contains { route ->
+                        destination.hasRoute(route::class)
                     }
                 } ?: false
 
@@ -51,11 +46,7 @@ class MainActivity : ComponentActivity() {
                         if (showBottomBar) {
                             BottomNavigationBar(
                                 navController = navController,
-                                currentDestination = currentDestination,
-                                userId = currentUserId,
-                                userPw = currentUserPw,
-                                userNickname = currentUserNickname,
-                                userDrink = currentUserDrink
+                                currentDestination = currentDestination
                             )
                         }
                     }
@@ -63,6 +54,10 @@ class MainActivity : ComponentActivity() {
                     DiveNavHost(
                         navController = navController,
                         paddingValues = innerPadding,
+                        userId = currentUserId,
+                        userPw = currentUserPw,
+                        userNickname = currentUserNickname,
+                        userDrink = currentUserDrink,
                         onUserInfoChanged = { userId, userPw, nickname, drink ->
                             currentUserId = userId
                             currentUserPw = userPw
