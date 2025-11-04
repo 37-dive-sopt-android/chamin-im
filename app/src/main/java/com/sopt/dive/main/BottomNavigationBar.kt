@@ -1,3 +1,5 @@
+// BottomNavigationBar.kt
+
 package com.sopt.dive.main
 
 import androidx.compose.material.icons.Icons
@@ -11,6 +13,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import com.sopt.dive.navigation.Home
 import com.sopt.dive.navigation.MyPage
@@ -21,7 +25,7 @@ import com.sopt.dive.ui.theme.Teel700
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController,
-    currentRoute: String?,
+    currentDestination: NavDestination?,
     userId: String,
     userPw: String,
     userNickname: String,
@@ -31,11 +35,15 @@ fun BottomNavigationBar(
         containerColor = Teel200,
         contentColor = Teel700
     ) {
+        val isHomeSelected = currentDestination?.hasRoute(Home::class) == true
+        val isSearchSelected = currentDestination?.hasRoute(Search::class) == true
+        val isMyPageSelected = currentDestination?.hasRoute(MyPage::class) == true
+
         // Home 탭
         NavigationBarItem(
-            selected = currentRoute?.contains("Home") == true,
+            selected = isHomeSelected,
             onClick = {
-                if (currentRoute?.contains("Home") != true) {
+                if (!isHomeSelected) {
                     navController.navigate(
                         Home(
                             userId = userId,
@@ -43,7 +51,10 @@ fun BottomNavigationBar(
                         )
                     ) {
                         launchSingleTop = true
-                        popUpTo(navController.graph.startDestinationId)
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        restoreState = true
                     }
                 }
             },
@@ -65,12 +76,15 @@ fun BottomNavigationBar(
 
         // Search 탭
         NavigationBarItem(
-            selected = currentRoute?.contains("Search") == true,
+            selected = isSearchSelected,
             onClick = {
-                if (currentRoute?.contains("Search") != true) {
+                if (!isSearchSelected) {
                     navController.navigate(Search) {
                         launchSingleTop = true
-                        popUpTo(navController.graph.startDestinationId)
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        restoreState = true
                     }
                 }
             },
@@ -92,9 +106,9 @@ fun BottomNavigationBar(
 
         // My 탭
         NavigationBarItem(
-            selected = currentRoute?.contains("MyPage") == true,
+            selected = isMyPageSelected,
             onClick = {
-                if (currentRoute?.contains("MyPage") != true) {
+                if (!isMyPageSelected) {
                     navController.navigate(
                         MyPage(
                             userId = userId,
@@ -104,7 +118,10 @@ fun BottomNavigationBar(
                         )
                     ) {
                         launchSingleTop = true
-                        popUpTo(navController.graph.startDestinationId)
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        restoreState = true
                     }
                 }
             },

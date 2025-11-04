@@ -53,8 +53,6 @@ class LoginActivity : ComponentActivity() {
                             .fillMaxSize(),
                         signUpId = signUpId,
                         signUpPw = signUpPw,
-                        signUpNickname = signUpNickname,
-                        signUpDrink = signUpDrink,
                         onSignUpClick = {
                             val intent = Intent(this, SignUpActivity::class.java)
                             signUpLauncher.launch(intent)

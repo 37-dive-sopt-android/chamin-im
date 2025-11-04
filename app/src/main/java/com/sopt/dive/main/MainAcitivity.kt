@@ -1,6 +1,5 @@
 package com.sopt.dive
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,58 +7,68 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.sopt.dive.login.LoginActivity
 import com.sopt.dive.main.BottomNavigationBar
 import com.sopt.dive.navigation.DiveNavHost
+import com.sopt.dive.navigation.Home
+import com.sopt.dive.navigation.MyPage
+import com.sopt.dive.navigation.Search
 import com.sopt.dive.ui.theme.DiveTheme
-import com.sopt.dive.util.KeyStorage
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val userId = intent.getStringExtra(KeyStorage.ID) ?: ""
-        val userPw = intent.getStringExtra(KeyStorage.PW) ?: ""
-        val userNickname = intent.getStringExtra(KeyStorage.NICKNAME) ?: ""
-        val userDrink = intent.getStringExtra(KeyStorage.DRINK) ?: ""
-
-        //로그인 정보 없을 때
-        if (userId.isEmpty()) {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-            return
-        }
 
         enableEdgeToEdge()
         setContent {
             DiveTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
+                val currentDestination: NavDestination? = navBackStackEntry?.destination // stirng 대신 객체 가져오게
+
+                // 사용자 정보를 저장할 상태
+                var currentUserId by remember { mutableStateOf("") }
+                var currentUserPw by remember { mutableStateOf("") }
+                var currentUserNickname by remember { mutableStateOf("") }
+                var currentUserDrink by remember { mutableStateOf("") }
+
+                val showBottomBar = currentDestination?.let { destination ->
+                    listOf(Home::class, Search::class, MyPage::class).any { tabClass ->
+                        destination.hasRoute(tabClass)
+                    }
+                } ?: false
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        BottomNavigationBar(
-                            navController = navController,
-                            currentRoute = currentRoute,
-                            userId = userId,
-                            userPw = userPw,
-                            userNickname = userNickname,
-                            userDrink = userDrink
-                        )
+                        if (showBottomBar) {
+                            BottomNavigationBar(
+                                navController = navController,
+                                currentDestination = currentDestination,
+                                userId = currentUserId,
+                                userPw = currentUserPw,
+                                userNickname = currentUserNickname,
+                                userDrink = currentUserDrink
+                            )
+                        }
                     }
                 ) { innerPadding ->
                     DiveNavHost(
                         navController = navController,
                         paddingValues = innerPadding,
-                        userId = userId,
-                        userPw = userPw,
-                        userNickname = userNickname,
-                        userDrink = userDrink
+                        onUserInfoChanged = { userId, userPw, nickname, drink ->
+                            currentUserId = userId
+                            currentUserPw = userPw
+                            currentUserNickname = nickname
+                            currentUserDrink = drink
+                        }
                     )
                 }
             }
