@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,70 +14,8 @@ import androidx.compose.ui.unit.dp
 import com.sopt.dive.R
 import com.sopt.dive.component.card.CommentCard
 import com.sopt.dive.component.card.ProfileCard
-
-data class Comment(
-    val name: String,
-    val img: Int,
-    val comments: String,
-)
-
-val comments = listOf(
-    Comment(
-        name = "엄마",
-        img = R.drawable.profile_image,
-        comments = "화이팅!"
-    ),
-    Comment(
-        name = "아빠",
-        img = R.drawable.profile_image,
-        comments = "좋은 하루~~"
-    ),
-    Comment(
-        name = "가람",
-        img = R.drawable.profile_image,
-        comments = "날씨 좋네요"
-    ),
-    Comment(
-        name = "해솔",
-        img = R.drawable.profile_image,
-        comments = "겨울엔 붕어빵!"
-    ),
-    Comment(
-        name = "지원",
-        img = R.drawable.profile_image,
-        comments = "다들 화이팅!!"
-    ),
-    Comment(
-        name = "크크",
-        img = R.drawable.profile_image,
-        comments = "크크 크롱"
-    ),
-    Comment(
-        name = "뽀로로",
-        img = R.drawable.profile_image,
-        comments = "다 같이 놀자"
-    ),
-    Comment(
-        name = "더미",
-        img = R.drawable.profile_image,
-        comments = "더미더미"
-    ),
-    Comment(
-        name = "더미",
-        img = R.drawable.profile_image,
-        comments = "더미더미"
-    ),
-    Comment(
-        name = "더미",
-        img = R.drawable.profile_image,
-        comments = "더미더미"
-    ),
-    Comment(
-        name = "더미",
-        img = R.drawable.profile_image,
-        comments = "더미더미"
-    ),
-)
+import com.sopt.dive.home.data.comments
+import androidx.compose.foundation.lazy.items
 
 @Composable
 fun HomeScreen(
@@ -86,8 +23,6 @@ fun HomeScreen(
     userId: String,
     nickname: String,
     modifier: Modifier = Modifier,
-    onNavigateToSearch: () -> Unit = {},
-    onNavigateToMy: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
