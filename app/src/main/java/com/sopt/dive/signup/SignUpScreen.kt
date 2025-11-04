@@ -1,6 +1,7 @@
 package com.sopt.dive.signup
 
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.sopt.dive.R
 import com.sopt.dive.component.text.DiveTitle
 import com.sopt.dive.component.textfield.DiveTextField
+import com.sopt.dive.util.SignUpValidator
 import com.sopt.dive.ui.component.button.DiveButton
 import com.sopt.dive.ui.theme.DiveTheme
 
@@ -37,91 +39,6 @@ fun SignUpScreen(
     var nicknameText by remember { mutableStateOf("") }
     var drinkText by remember { mutableStateOf("") }
 
-    // 에러 메시지 상태 관리
-    var idError by remember { mutableStateOf("") }
-    var pwError by remember { mutableStateOf("") }
-    var nicknameError by remember { mutableStateOf("") }
-    var drinkError by remember { mutableStateOf("") }
-
-    // 유효성 검사 함수들
-    fun isValidId(id: String): Boolean {
-        return when {
-            id.isEmpty() -> {
-                idError = "ID를 입력해주세요."
-                false
-            }
-            id.contains(" ") -> {
-                idError = "ID에는 공백을 사용할 수 없습니다."
-                false
-            }
-            id.length !in 6..10 -> {
-                idError = "ID는 6 ~ 10글자 사이여야 합니다."
-                false
-            }
-            else -> {
-                idError = ""
-                true
-            }
-        }
-    }
-
-    fun isValidPassword(pw: String): Boolean {
-        return when {
-            pw.isEmpty() -> {
-                pwError = "비밀번호를 입력해주세요."
-                false
-            }
-            pw.contains(" ") -> {
-                pwError = "비밀번호에는 공백을 사용할 수 없습니다."
-                false
-            }
-            pw.length !in 8..12 -> {
-                pwError = "비밀번호는 8 ~ 12글자 사이여야 합니다."
-                false
-            }
-            else -> {
-                pwError = ""
-                true
-            }
-        }
-    }
-
-    fun isValidNickname(nickname: String): Boolean {
-        return when {
-            nickname.isEmpty() -> {
-                nicknameError = "닉네임을 입력해주세요."
-                false
-            }
-            nickname.isBlank() || nickname.contains(" ") -> {
-                nicknameError = "닉네임에 공백을 사용할 수 없습니다."
-                false
-            }
-            else -> {
-                nicknameError = ""
-                true
-            }
-        }
-    }
-
-    fun isValidDrink(drink: String): Boolean {
-        return when {
-            drink.isEmpty() -> {
-                drinkError = "주량을 입력해주세요."
-                false
-            }
-            !drink.all { it.isDigit() } -> {
-                drinkError = "숫자만 입력 가능합니다."
-                false
-            }
-            else -> {
-                drinkError = ""
-                true
-            }
-        }
-    }
-
-    fun validateAll() = isValidId(idText) && isValidPassword(pwText) && isValidNickname(nicknameText) && isValidDrink(drinkText)
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -135,58 +52,42 @@ fun SignUpScreen(
 
         // 입력 필드들
         Column {
-            // ID 입력
-            DiveTextField(
-                label = stringResource(R.string.id_label),
+            SignUpFormTextField(
+                labelRes = R.string.id_label,
+                placeholderRes = R.string.id_placeholder,
                 value = idText,
-                onValueChange = {
-                    idText = it
-                    isValidId(it)
-                },
-                placeholder = stringResource(R.string.id_placeholder),
-                errorMessage = idError
+                onValueChange = { idText = it },
+                validateFunc = SignUpValidator::validateId
             )
 
             Spacer(Modifier.height(20.dp))
 
-            // 비밀번호 입력
-            DiveTextField(
-                label = stringResource(R.string.pw_label),
+            SignUpFormTextField(
+                labelRes = R.string.pw_label,
+                placeholderRes = R.string.pw_placeholder,
                 value = pwText,
-                onValueChange = {
-                    pwText = it
-                    isValidPassword(it)
-                },
-                placeholder = stringResource(R.string.pw_placeholder),
-                errorMessage = pwError
+                onValueChange = { pwText = it },
+                validateFunc = SignUpValidator::validatePassword
             )
 
             Spacer(Modifier.height(20.dp))
 
-            // 닉네임 입력
-            DiveTextField(
-                label = stringResource(R.string.nickname_label),
+            SignUpFormTextField(
+                labelRes = R.string.nickname_label,
+                placeholderRes = R.string.nickname_placeholder,
                 value = nicknameText,
-                onValueChange = {
-                    nicknameText = it
-                    isValidNickname(it)
-                },
-                placeholder = stringResource(R.string.nickname_placeholder),
-                errorMessage = nicknameError
+                onValueChange = { nicknameText = it },
+                validateFunc = SignUpValidator::validateNickname
             )
 
             Spacer(Modifier.height(20.dp))
 
-            // 주량 입력
-            DiveTextField(
-                label = stringResource(R.string.alcohol_capacity_label),
+            SignUpFormTextField(
+                labelRes = R.string.alcohol_capacity_label,
+                placeholderRes = R.string.alcohol_placeholder,
                 value = drinkText,
-                onValueChange = {
-                    drinkText = it
-                    isValidDrink(it)
-                },
-                placeholder = stringResource(R.string.alcohol_placeholder),
-                errorMessage = drinkError
+                onValueChange = { drinkText = it },
+                validateFunc = SignUpValidator::validateDrink
             )
         }
 
@@ -196,7 +97,7 @@ fun SignUpScreen(
         DiveButton(
             text = stringResource(R.string.sign_up_button),
             onClick = {
-                if (validateAll()) {
+                if (SignUpValidator.isAllValid(idText, pwText, nicknameText, drinkText)) {
                     Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
                     onSignUpSuccess(idText, pwText, nicknameText, drinkText)
                 } else {
@@ -205,6 +106,32 @@ fun SignUpScreen(
             }
         )
     }
+}
+
+@Composable
+private fun SignUpFormTextField(
+    labelRes: Int,
+    placeholderRes: Int,
+    value: String,
+    onValueChange: (String) -> Unit,
+    validateFunc: (String) -> String,
+    modifier: Modifier = Modifier
+) {
+    // 실시간으로 에러 메시지 계산
+    val errorMessage = if (value.isNotBlank()) {
+        validateFunc(value)
+    } else {
+        ""
+    }
+
+    DiveTextField(
+        modifier = modifier,
+        label = stringResource(labelRes),
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = stringResource(placeholderRes),
+        errorMessage = errorMessage
+    )
 }
 
 @Preview(showBackground = true)
