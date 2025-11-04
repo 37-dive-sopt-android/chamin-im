@@ -30,12 +30,10 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     signUpId: String = "",
     signUpPw: String = "",
-    signUpNickname: String = "",
-    signUpDrink: String = "",
-    onSignUpClick: () -> Unit = {},
-    onLoginSuccess: () -> Unit = {},
-    onNeedSignUp: () -> Unit = {},
-    onLoginFailure: () -> Unit = {}
+    onSignUpClick: () -> Unit,
+    onLoginSuccess: () -> Unit,
+    onNeedSignUp: () -> Unit,
+    onLoginFailure: () -> Unit
 ) {
     var idText by remember(signUpId) { mutableStateOf("") }
     var pwText by remember(signUpPw) { mutableStateOf("") }
@@ -110,5 +108,11 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    LoginScreen(Modifier.fillMaxSize())
+    LoginScreen(
+        modifier = Modifier.fillMaxSize(),
+        onSignUpClick = {},
+        onLoginSuccess = {},
+        onNeedSignUp = {},
+        onLoginFailure = {}
+    )
 }

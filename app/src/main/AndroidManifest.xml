@@ -27,6 +27,13 @@
             android:theme="@style/Theme.Dive">
         </activity>
 
+<!--        <activity-->
+<!--            android:name=".practice.Week3Practice"-->
+<!--            android:exported="true"-->
+<!--            android:label="@string/app_name"-->
+<!--            android:theme="@style/Theme.Dive">-->
+<!--        </activity>-->
+
         <activity
             android:name=".login.LoginActivity"
             android:exported="true"
@@ -39,6 +46,17 @@
             </intent-filter>
         </activity>
 
+<!--        <activity-->
+<!--            android:name=".practice.Week3Practice"-->
+<!--            android:exported="true"-->
+<!--            android:label="@string/app_name"-->
+<!--            android:theme="@style/Theme.Dive">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
 
     </application>
 

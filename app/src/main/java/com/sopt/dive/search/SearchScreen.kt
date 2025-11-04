@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 fun SearchScreen(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {}
 ) {
     Box(
         modifier = modifier

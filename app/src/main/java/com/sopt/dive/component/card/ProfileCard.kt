@@ -43,7 +43,9 @@ fun ProfileCard(
         Image(
             painter = painterResource(profileImageRes),
             contentDescription = "프로필 이미지",
-            modifier = Modifier.size(100.dp).clip(RoundedCornerShape(12.dp))
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(12.dp))
         )
 
         Spacer(Modifier.width(20.dp))

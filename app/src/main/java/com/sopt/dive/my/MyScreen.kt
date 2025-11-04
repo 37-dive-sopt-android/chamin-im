@@ -1,5 +1,6 @@
 package com.sopt.dive.my
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +25,6 @@ fun MyScreen(
     nickname: String,
     drink: String,
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -60,29 +60,26 @@ private fun UserInfoSection(
     userDrink: String,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.padding(30.dp)) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = modifier.padding(30.dp)
+    ) {
         // ID
         InfoItem(
             label = "ID",
             value = userId
         )
 
-        Spacer(Modifier.height(24.dp))
-
         InfoItem(
             label = "PW",
             value = userPw
         )
-
-        Spacer(Modifier.height(24.dp))
 
         // NICKNAME
         InfoItem(
             label = "NICKNAME",
             value = userNickname
         )
-
-        Spacer(Modifier.height(24.dp))
 
         // 주량
         InfoItem(
