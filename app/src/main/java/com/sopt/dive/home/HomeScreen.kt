@@ -16,6 +16,7 @@ import com.sopt.dive.component.card.CommentCard
 import com.sopt.dive.component.card.ProfileCard
 import com.sopt.dive.home.data.comments
 import androidx.compose.foundation.lazy.items
+import com.sopt.dive.component.card.CommentData
 
 @Composable
 fun HomeScreen(
@@ -47,9 +48,11 @@ fun HomeScreen(
         // 코멘트 리스트
         items(comments) { comment ->
             CommentCard(
-                name = comment.name,
-                comment = comment.comments,
-                profileImageRes = comment.img
+                commentData = CommentData(
+                    name = comment.name,
+                    comment = comment.comments,
+                    profileImageRes = comment.img
+                )
             )
         }
     }

@@ -25,11 +25,15 @@ import androidx.compose.ui.unit.sp
 import com.sopt.dive.R
 import com.sopt.dive.ui.theme.DiveTheme
 
+data class CommentData(
+    val name: String,
+    val comment: String,
+    val profileImageRes: Int
+)
+
 @Composable
 fun CommentCard(
-    name: String,
-    comment: String,
-    profileImageRes: Int,
+    commentData: CommentData,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -40,9 +44,8 @@ fun CommentCard(
             .background(Color(0xFFE0E0E0))
             .padding(16.dp)
     ) {
-        // 프로필 이미지
         Image(
-            painter = painterResource(profileImageRes),
+            painter = painterResource(commentData.profileImageRes),
             contentDescription = "프로필 이미지",
             modifier = Modifier
                 .size(48.dp)
@@ -54,7 +57,7 @@ fun CommentCard(
         // 이름과 코멘트
         Column {
             Text(
-                text = name,
+                text = commentData.name,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )
@@ -62,23 +65,10 @@ fun CommentCard(
             Spacer(Modifier.width(4.dp))
 
             Text(
-                text = comment,
+                text = commentData.comment,
                 fontSize = 13.sp,
                 color = Color.Gray
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun CommentCardPreview() {
-    DiveTheme {
-        CommentCard(
-            name = "임차민",
-            comment = "빨리 안두콩들 보고싶다.",
-            profileImageRes = R.drawable.profile_image,
-            modifier = Modifier.padding(16.dp)
-        )
     }
 }
