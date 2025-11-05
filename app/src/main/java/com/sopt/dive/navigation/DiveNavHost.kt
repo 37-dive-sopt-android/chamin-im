@@ -46,33 +46,36 @@ fun DiveNavHost(
                 onSignUpClick = {
                     navController.navigate(SignUp)
                 },
-                onLoginSuccess = {
-                    Toast.makeText(
-                        context,
-                        "로그인 성공! ${signUpNickname}님 환영합니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                onLoginClick = { inputId, inputPw ->
+                    when {
+                        inputId == signUpId && inputPw == signUpPw -> {
+                            Toast.makeText(
+                                context,
+                                "로그인 성공! ${signUpNickname}님 환영합니다.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            onUserInfoChanged(signUpId, signUpPw, signUpNickname, signUpDrink)
+                            navController.navigate(Home) {
+                                popUpTo(Login) { inclusive = true }
+                            }
+                        }
 
-                    // 사용자 정보 업데이트
-                    onUserInfoChanged(signUpId, signUpPw, signUpNickname, signUpDrink)
+                        signUpId.isEmpty() -> {
+                            Toast.makeText(
+                                context,
+                                "먼저 회원가입을 해주세요.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
 
-                    navController.navigate(Home) {
-                        popUpTo(Login) { inclusive = true }
+                        else -> {
+                            Toast.makeText(
+                                context,
+                                "아이디 또는 비밀번호가 일치하지 않습니다.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
-                },
-                onNeedSignUp = {
-                    Toast.makeText(
-                        context,
-                        "먼저 회원가입을 해주세요.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                },
-                onLoginFailure = {
-                    Toast.makeText(
-                        context,
-                        "아이디 또는 비밀번호가 일치하지 않습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             )
         }

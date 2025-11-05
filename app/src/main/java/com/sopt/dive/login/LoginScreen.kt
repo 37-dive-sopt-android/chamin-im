@@ -31,9 +31,7 @@ fun LoginScreen(
     signUpId: String = "",
     signUpPw: String = "",
     onSignUpClick: () -> Unit,
-    onLoginSuccess: () -> Unit,
-    onNeedSignUp: () -> Unit,
-    onLoginFailure: () -> Unit
+    onLoginClick: (id: String, pw: String) -> Unit
 ) {
     var idText by remember(signUpId) { mutableStateOf("") }
     var pwText by remember(signUpPw) { mutableStateOf("") }
@@ -86,11 +84,7 @@ fun LoginScreen(
         DiveButton(
             text = stringResource(R.string.login_button),
             onClick = {
-                when {
-                    isLoginSuccessful() -> onLoginSuccess()
-                    signUpId.isEmpty() -> onNeedSignUp()
-                    else -> onLoginFailure()
-                }
+                onLoginClick(idText, pwText)
             }
         )
 
@@ -111,8 +105,6 @@ private fun Preview() {
     LoginScreen(
         modifier = Modifier.fillMaxSize(),
         onSignUpClick = {},
-        onLoginSuccess = {},
-        onNeedSignUp = {},
-        onLoginFailure = {}
+        onLoginClick = { ckals413, aaaaaaaa -> }
     )
 }
