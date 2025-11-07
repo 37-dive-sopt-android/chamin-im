@@ -7,16 +7,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sopt.dive.R
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sopt.dive.component.card.CommentCard
 import com.sopt.dive.component.card.ProfileCard
-import com.sopt.dive.home.data.comments
-import androidx.compose.foundation.lazy.items
-import com.sopt.dive.component.card.CommentData
 
 @Composable
 fun HomeScreen(
@@ -24,7 +25,16 @@ fun HomeScreen(
     userId: String,
     nickname: String,
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel()
 ) {
+
+    LaunchedEffect(nickname) {
+        viewModel.setUserProfile(nickname)
+    }
+
+    // 상태 구독
+    val uiState by viewModel.uiState.collectAsState()
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -32,28 +42,21 @@ fun HomeScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // 프로필 카드
-        item {
-            ProfileCard(
-                name = nickname,
-                description = "37기 안드로이드 YB 입니다!!",
-                profileImageRes = R.drawable.chamin_profile_image
-            )
-        }
-
-        item {
-            Spacer(Modifier.height(8.dp))
-        }
-
-        // 코멘트 리스트
-        items(comments) { comment ->
-            CommentCard(
-                commentData = CommentData(
-                    name = comment.name,
-                    comment = comment.comments,
-                    profileImageRes = comment.img
+        uiState.profile?.let { profileData ->
+            item {
+                ProfileCard(
+                    name = profileData.name,
+                    description = profileData.description,
+                    profileImageRes = profileData.profileImageRes
                 )
-            )
+            }
+
+            item {
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+        items(uiState.comments) { comment ->
+            CommentCard(commentData = comment)
         }
     }
 }
