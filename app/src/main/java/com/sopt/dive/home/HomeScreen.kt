@@ -22,15 +22,9 @@ import com.sopt.dive.component.card.ProfileCard
 @Composable
 fun HomeScreen(
     paddingValues: PaddingValues,
-    userId: String,
-    nickname: String,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel()
 ) {
-
-    LaunchedEffect(nickname) {
-        viewModel.setUserProfile(nickname)
-    }
 
     // 상태 구독
     val uiState by viewModel.uiState.collectAsState()
@@ -42,16 +36,13 @@ fun HomeScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        uiState.profile?.let { profileData ->
+        uiState.profile.let { profileData ->
             item {
                 ProfileCard(
                     name = profileData.name,
                     description = profileData.description,
                     profileImageRes = profileData.profileImageRes
                 )
-            }
-
-            item {
                 Spacer(Modifier.height(8.dp))
             }
         }
@@ -66,8 +57,6 @@ fun HomeScreen(
 private fun HomeScreenPreview() {
     HomeScreen(
         paddingValues = PaddingValues(0.dp),
-        userId = "chamin",
-        nickname = "임차민",
         modifier = Modifier.fillMaxSize()
     )
 }

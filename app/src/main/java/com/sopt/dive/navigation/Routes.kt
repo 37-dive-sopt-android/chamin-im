@@ -14,7 +14,10 @@ data object SignUp : Route
 
 // 메인 탭 (바텀 네비게이션 O)
 @Serializable
-data object Home : MainTabRoute
+data class Home(
+    val userId: String ="",
+    val nickname: String =""
+) : MainTabRoute
 
 @Serializable
 data object Search : MainTabRoute
