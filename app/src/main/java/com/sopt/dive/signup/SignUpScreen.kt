@@ -29,7 +29,7 @@ import com.sopt.dive.ui.theme.DiveTheme
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    onSignUpSuccess: (String, String, String, String) -> Unit = { _, _, _, _ -> }
+    onSignUpSuccess: (String, String, String, String, String,) -> Unit = { _, _, _, _, _ -> }
 ) {
     val context = LocalContext.current
 
@@ -37,7 +37,9 @@ fun SignUpScreen(
     var idText by remember { mutableStateOf("") }
     var pwText by remember { mutableStateOf("") }
     var nicknameText by remember { mutableStateOf("") }
-    var drinkText by remember { mutableStateOf("") }
+    var emailText by remember { mutableStateOf("") }
+    var ageText by remember { mutableStateOf("") }
+
 
     Column(
         modifier = modifier
@@ -83,11 +85,21 @@ fun SignUpScreen(
             Spacer(Modifier.height(20.dp))
 
             SignUpFormTextField(
-                labelRes = R.string.alcohol_capacity_label,
-                placeholderRes = R.string.alcohol_placeholder,
-                value = drinkText,
-                onValueChange = { drinkText = it },
-                validateFunc = SignUpValidator::validateDrink
+                labelRes = R.string.email_label,
+                placeholderRes = R.string.email_placeholder,
+                value = emailText,
+                onValueChange = { emailText = it },
+                validateFunc = SignUpValidator::validateEmail
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            SignUpFormTextField(
+                labelRes = R.string.age_label,
+                placeholderRes = R.string.age_placeholder,
+                value = ageText,
+                onValueChange = { ageText = it },
+                validateFunc = SignUpValidator::validateAge
             )
         }
 
@@ -97,9 +109,9 @@ fun SignUpScreen(
         DiveButton(
             text = stringResource(R.string.sign_up_button),
             onClick = {
-                if (SignUpValidator.isAllValid(idText, pwText, nicknameText, drinkText)) {
+                if (SignUpValidator.isAllValid(idText, pwText, nicknameText, emailText,ageText)) {
                     Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
-                    onSignUpSuccess(idText, pwText, nicknameText, drinkText)
+                    onSignUpSuccess(idText, pwText, nicknameText, emailText, ageText)
                 } else {
                     Toast.makeText(context, "회원가입 실패했습니다.", Toast.LENGTH_SHORT).show()
                 }

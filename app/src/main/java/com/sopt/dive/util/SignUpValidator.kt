@@ -27,19 +27,30 @@ object SignUpValidator {
         }
     }
 
-    fun validateDrink(drink: String): String {
+    fun validateEmail(email: String): String {
+        val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+".toRegex()
+
         return when {
-            drink.isEmpty() -> "주량을 입력해주세요."
-            !drink.all { it.isDigit() } -> "숫자만 입력 가능합니다."
+            email.isEmpty() -> "이메일을 입력해주세요."
+            !email.matches(emailPattern) -> "이메일 형식이 올바르지 않습니다."
+            else -> "" // 유효한 경우
+        }
+    }
+
+    fun validateAge(age: String): String {
+        return when {
+            age.isEmpty() -> "나이를 입력해주세요."
+            !age.all { it.isDigit() } -> "숫자만 입력 가능합니다."
             else -> ""
         }
     }
 
     // 모든 필드 검사
-    fun isAllValid(id: String, password: String, nickname: String, drink: String): Boolean {
+    fun isAllValid(id: String, password: String, nickname: String, email: String,age: String): Boolean {
         return validateId(id).isEmpty() &&
                 validatePassword(password).isEmpty() &&
                 validateNickname(nickname).isEmpty() &&
-                validateDrink(drink).isEmpty()
+                validateEmail(email).isEmpty()&&
+                validateAge(age).isEmpty()
     }
 }

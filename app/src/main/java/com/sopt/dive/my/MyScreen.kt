@@ -23,7 +23,8 @@ fun MyScreen(
     userId: String,
     userPw: String,
     nickname: String,
-    drink: String,
+    email: String,
+    age: String,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -47,7 +48,8 @@ fun MyScreen(
             userId = userId,
             userPw = userPw,
             userNickname = nickname,
-            userDrink = drink
+            userEmail = email,
+            userAge = age
         )
     }
 }
@@ -57,7 +59,8 @@ private fun UserInfoSection(
     userId: String,
     userPw: String,
     userNickname: String,
-    userDrink: String,
+    userEmail: String,
+    userAge: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -81,10 +84,16 @@ private fun UserInfoSection(
             value = userNickname
         )
 
-        // 주량
+        // Email
         InfoItem(
-            label = "주량",
-            value = if (userDrink.isNotEmpty()) "${userDrink}병" else "-"
+            label = "EMAIL",
+            value = userEmail
+        )
+
+        // Age
+        InfoItem(
+            label = "AGE",
+            value = userAge
         )
     }
 }
@@ -98,7 +107,8 @@ private fun MyScreenPreview() {
             userId = "testId",
             userPw = "testPassword",
             nickname = "테스트차민",
-            drink = "1"
+            email = "ckals413@gmail.com",
+            age = "20",
         )
     }
 }

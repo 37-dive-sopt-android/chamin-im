@@ -24,8 +24,9 @@ fun DiveNavHost(
     userId: String,
     userPw: String,
     userNickname: String,
-    userDrink: String,
-    onUserInfoChanged: (String, String, String, String) -> Unit
+    userEmail: String,
+    userAge: String,
+    onUserInfoChanged: (String, String, String, String, String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -33,7 +34,9 @@ fun DiveNavHost(
     var signUpId by remember { mutableStateOf("") }
     var signUpPw by remember { mutableStateOf("") }
     var signUpNickname by remember { mutableStateOf("") }
-    var signUpDrink by remember { mutableStateOf("") }
+    var signUpEmail by remember { mutableStateOf("") }
+    var signUpAge by remember { mutableStateOf("") }
+
 
     NavHost(
         navController = navController,
@@ -54,7 +57,7 @@ fun DiveNavHost(
                                 "로그인 성공! ${signUpNickname}님 환영합니다.",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            onUserInfoChanged(signUpId, signUpPw, signUpNickname, signUpDrink)
+                            onUserInfoChanged(signUpId, signUpPw, signUpNickname, signUpEmail, signUpAge)
                             navController.navigate(
                                 Home(
                                     userId = signUpId,
@@ -87,12 +90,13 @@ fun DiveNavHost(
 
         composable<SignUp> {
             SignUpScreen(
-                onSignUpSuccess = { id, pw, nickname, drink ->
+                onSignUpSuccess = { id, pw, nickname, email, age ->
                     // 회원가입 정보 저장
                     signUpId = id
                     signUpPw = pw
                     signUpNickname = nickname
-                    signUpDrink = drink
+                    signUpEmail = email
+                    signUpAge = age
 
                     Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
 
@@ -119,7 +123,8 @@ fun DiveNavHost(
                 userId = userId,
                 userPw = userPw,
                 nickname = userNickname,
-                drink = userDrink
+                email = userEmail,
+                age = userAge,
             )
         }
     }

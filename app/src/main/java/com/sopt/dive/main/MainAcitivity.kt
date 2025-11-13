@@ -32,7 +32,8 @@ class MainActivity : ComponentActivity() {
                 var currentUserId by remember { mutableStateOf("") }
                 var currentUserPw by remember { mutableStateOf("") }
                 var currentUserNickname by remember { mutableStateOf("") }
-                var currentUserDrink by remember { mutableStateOf("") }
+                var currentUserEmail by remember { mutableStateOf("") }
+                var currentUserAge by remember { mutableStateOf("") }
 
                 val showBottomBar = currentDestination?.let { destination ->
                     MainTab.contains { route ->
@@ -57,12 +58,14 @@ class MainActivity : ComponentActivity() {
                         userId = currentUserId,
                         userPw = currentUserPw,
                         userNickname = currentUserNickname,
-                        userDrink = currentUserDrink,
-                        onUserInfoChanged = { userId, userPw, nickname, drink ->
+                        userEmail = currentUserEmail,
+                        userAge = currentUserAge,
+                        onUserInfoChanged = { userId, userPw, nickname, email, age ->
                             currentUserId = userId
                             currentUserPw = userPw
                             currentUserNickname = nickname
-                            currentUserDrink = drink
+                            currentUserEmail = email
+                            currentUserAge = age
                         }
                     )
                 }
