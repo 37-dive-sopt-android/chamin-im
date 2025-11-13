@@ -1,7 +1,6 @@
 package com.sopt.dive.signup
 
 import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,19 +8,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sopt.dive.R
 import com.sopt.dive.component.text.DiveTitle
 import com.sopt.dive.component.textfield.DiveTextField
-import com.sopt.dive.util.SignUpValidator
 import com.sopt.dive.ui.component.button.DiveButton
 import com.sopt.dive.ui.theme.DiveTheme
 
@@ -29,17 +26,11 @@ import com.sopt.dive.ui.theme.DiveTheme
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    onSignUpSuccess: (String, String, String, String, String,) -> Unit = { _, _, _, _, _ -> }
+    viewModel: SignUpViewModel = viewModel(),
+    onSignUpSuccess: (String, String, String, String, String) -> Unit = { _, _, _, _, _ -> }
 ) {
     val context = LocalContext.current
-
-    // 입력값 상태 관리
-    var idText by remember { mutableStateOf("") }
-    var pwText by remember { mutableStateOf("") }
-    var nicknameText by remember { mutableStateOf("") }
-    var emailText by remember { mutableStateOf("") }
-    var ageText by remember { mutableStateOf("") }
-
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -54,52 +45,52 @@ fun SignUpScreen(
 
         // 입력 필드들
         Column {
-            SignUpFormTextField(
-                labelRes = R.string.id_label,
-                placeholderRes = R.string.id_placeholder,
-                value = idText,
-                onValueChange = { idText = it },
-                validateFunc = SignUpValidator::validateId
+            DiveTextField(
+                label = stringResource(R.string.id_label),
+                placeholder = stringResource(R.string.id_placeholder),
+                value = uiState.id,
+                onValueChange = viewModel::updateId,
+                errorMessage = uiState.idError
             )
 
             Spacer(Modifier.height(20.dp))
 
-            SignUpFormTextField(
-                labelRes = R.string.pw_label,
-                placeholderRes = R.string.pw_placeholder,
-                value = pwText,
-                onValueChange = { pwText = it },
-                validateFunc = SignUpValidator::validatePassword
+            DiveTextField(
+                label = stringResource(R.string.pw_label),
+                value = uiState.password,
+                onValueChange = viewModel::updatePassword,
+                placeholder = stringResource(R.string.pw_placeholder),
+                errorMessage = uiState.passwordError
             )
 
             Spacer(Modifier.height(20.dp))
 
-            SignUpFormTextField(
-                labelRes = R.string.nickname_label,
-                placeholderRes = R.string.nickname_placeholder,
-                value = nicknameText,
-                onValueChange = { nicknameText = it },
-                validateFunc = SignUpValidator::validateNickname
+            DiveTextField(
+                label = stringResource(R.string.nickname_label),
+                value = uiState.nickname,
+                onValueChange = viewModel::updateNickname,
+                placeholder = stringResource(R.string.nickname_placeholder),
+                errorMessage = uiState.nicknameError
             )
 
             Spacer(Modifier.height(20.dp))
 
-            SignUpFormTextField(
-                labelRes = R.string.email_label,
-                placeholderRes = R.string.email_placeholder,
-                value = emailText,
-                onValueChange = { emailText = it },
-                validateFunc = SignUpValidator::validateEmail
+            DiveTextField(
+                label = stringResource(R.string.email_label),
+                value = uiState.email,
+                onValueChange = viewModel::updateEmail,
+                placeholder = stringResource(R.string.email_placeholder),
+                errorMessage = uiState.emailError
             )
 
             Spacer(Modifier.height(20.dp))
 
-            SignUpFormTextField(
-                labelRes = R.string.age_label,
-                placeholderRes = R.string.age_placeholder,
-                value = ageText,
-                onValueChange = { ageText = it },
-                validateFunc = SignUpValidator::validateAge
+            DiveTextField(
+                label = stringResource(R.string.age_label),
+                value = uiState.age,
+                onValueChange = viewModel::updateAge,
+                placeholder = stringResource(R.string.age_placeholder),
+                errorMessage = uiState.ageError
             )
         }
 
@@ -109,41 +100,21 @@ fun SignUpScreen(
         DiveButton(
             text = stringResource(R.string.sign_up_button),
             onClick = {
-                if (SignUpValidator.isAllValid(idText, pwText, nicknameText, emailText,ageText)) {
+                if (viewModel.signUp()) {
                     Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
-                    onSignUpSuccess(idText, pwText, nicknameText, emailText, ageText)
+                    onSignUpSuccess(
+                        uiState.id,
+                        uiState.password,
+                        uiState.nickname,
+                        uiState.email,
+                        uiState.age
+                    )
                 } else {
                     Toast.makeText(context, "회원가입 실패했습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         )
     }
-}
-
-@Composable
-private fun SignUpFormTextField(
-    labelRes: Int,
-    placeholderRes: Int,
-    value: String,
-    onValueChange: (String) -> Unit,
-    validateFunc: (String) -> String,
-    modifier: Modifier = Modifier
-) {
-    // 실시간으로 에러 메시지 계산
-    val errorMessage = if (value.isNotBlank()) {
-        validateFunc(value)
-    } else {
-        ""
-    }
-
-    DiveTextField(
-        modifier = modifier,
-        label = stringResource(labelRes),
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = stringResource(placeholderRes),
-        errorMessage = errorMessage
-    )
 }
 
 @Preview(showBackground = true)
