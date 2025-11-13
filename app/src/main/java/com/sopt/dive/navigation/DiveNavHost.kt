@@ -55,7 +55,12 @@ fun DiveNavHost(
                                 Toast.LENGTH_SHORT
                             ).show()
                             onUserInfoChanged(signUpId, signUpPw, signUpNickname, signUpDrink)
-                            navController.navigate(Home) {
+                            navController.navigate(
+                                Home(
+                                    userId = signUpId,
+                                    nickname = signUpNickname
+                                )
+                            ) {
                                 popUpTo(Login) { inclusive = true }
                             }
                         }
@@ -98,9 +103,7 @@ fun DiveNavHost(
 
         composable<Home> {
             HomeScreen(
-                paddingValues = paddingValues,
-                userId = userId,
-                nickname = userNickname
+                paddingValues = paddingValues
             )
         }
 

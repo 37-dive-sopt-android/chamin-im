@@ -19,11 +19,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sopt.dive.R
-import com.sopt.dive.ui.theme.DiveTheme
+import com.sopt.dive.home.data.Comment
 
 data class CommentData(
     val name: String,
@@ -33,7 +31,7 @@ data class CommentData(
 
 @Composable
 fun CommentCard(
-    commentData: CommentData,
+    commentData: Comment,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -45,7 +43,7 @@ fun CommentCard(
             .padding(16.dp)
     ) {
         Image(
-            painter = painterResource(commentData.profileImageRes),
+            painter = painterResource(commentData.img),
             contentDescription = "프로필 이미지",
             modifier = Modifier
                 .size(48.dp)
@@ -65,7 +63,7 @@ fun CommentCard(
             Spacer(Modifier.width(4.dp))
 
             Text(
-                text = commentData.comment,
+                text = commentData.comments,
                 fontSize = 13.sp,
                 color = Color.Gray
             )

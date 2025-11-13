@@ -18,7 +18,7 @@ enum class MainTab(
 ) {
     HOME(
         icon = Icons.Default.Home,
-        route = Home,
+        route = Home(),
         label = "홈"
     ),
     SEARCH(
