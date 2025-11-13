@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -19,6 +16,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sopt.dive.R
 import com.sopt.dive.component.text.DiveTitle
 import com.sopt.dive.component.textfield.DiveTextField
@@ -28,20 +27,14 @@ import com.sopt.dive.ui.component.button.DiveButton
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = viewModel(),
     signUpId: String = "",
     signUpPw: String = "",
     onSignUpClick: () -> Unit,
-    onLoginClick: (id: String, pw: String) -> Unit
+    onLoginClick: (id: String, pw: String) -> Unit,
+    onLoginResult: (LoginResult) -> Unit
 ) {
-    var idText by remember(signUpId) { mutableStateOf("") }
-    var pwText by remember(signUpPw) { mutableStateOf("") }
-
-    // 로그인 유효성
-    fun isLoginSuccessful(): Boolean {
-        return idText == signUpId &&
-                pwText == signUpPw &&
-                signUpId.isNotEmpty()
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -59,10 +52,10 @@ fun LoginScreen(
             // ID 입력
             DiveTextField(
                 label = stringResource(R.string.id_label),
-                value = idText,
-                onValueChange = { idText = it },
+                value = uiState.id,
+                onValueChange = viewModel::updateId,
                 placeholder = stringResource(R.string.id_placeholder),
-                errorMessage = ""
+                errorMessage = uiState.idError
             )
 
             Spacer(Modifier.height(20.dp))
@@ -70,10 +63,10 @@ fun LoginScreen(
             // 비밀번호 입력
             DiveTextField(
                 label = stringResource(R.string.password_label),
-                value = pwText,
-                onValueChange = { pwText = it },
+                value = uiState.password,
+                onValueChange = viewModel::updatePassword,
                 placeholder = stringResource(R.string.pw_placeholder),
-                errorMessage = "",
+                errorMessage = uiState.passwordError,
                 visualTransformation = PasswordVisualTransformation()
             )
         }
@@ -84,7 +77,12 @@ fun LoginScreen(
         DiveButton(
             text = stringResource(R.string.login_button),
             onClick = {
-                onLoginClick(idText, pwText)
+                val result = viewModel.validateLogin(signUpId, signUpPw)
+                onLoginResult(result)
+
+                if (result is LoginResult.Success) {
+                    onLoginClick(uiState.id, uiState.password)
+                }
             }
         )
 
@@ -105,6 +103,7 @@ private fun Preview() {
     LoginScreen(
         modifier = Modifier.fillMaxSize(),
         onSignUpClick = {},
-        onLoginClick = { ckals413, aaaaaaaa -> }
+        onLoginClick = { ckals413, aaaaaaaa -> },
+        onLoginResult = {}
     )
 }

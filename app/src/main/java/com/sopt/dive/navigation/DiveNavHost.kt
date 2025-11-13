@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.sopt.dive.home.HomeScreen
+import com.sopt.dive.login.LoginResult
 import com.sopt.dive.login.LoginScreen
 import com.sopt.dive.my.MyScreen
 import com.sopt.dive.search.SearchScreen
@@ -49,9 +50,10 @@ fun DiveNavHost(
                 onSignUpClick = {
                     navController.navigate(SignUp)
                 },
-                onLoginClick = { inputId, inputPw ->
-                    when {
-                        inputId == signUpId && inputPw == signUpPw -> {
+                onLoginClick = { _, _ -> },
+                onLoginResult = { result ->
+                    when (result) {
+                        is LoginResult.Success -> {
                             Toast.makeText(
                                 context,
                                 "로그인 성공! ${signUpNickname}님 환영합니다.",
@@ -67,16 +69,14 @@ fun DiveNavHost(
                                 popUpTo(Login) { inclusive = true }
                             }
                         }
-
-                        signUpId.isEmpty() -> {
+                        is LoginResult.NoSignUp -> {
                             Toast.makeText(
                                 context,
                                 "먼저 회원가입을 해주세요.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-
-                        else -> {
+                        is LoginResult.InvalidCredentials -> {
                             Toast.makeText(
                                 context,
                                 "아이디 또는 비밀번호가 일치하지 않습니다.",
