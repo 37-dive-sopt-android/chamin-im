@@ -100,18 +100,21 @@ fun SignUpScreen(
         DiveButton(
             text = stringResource(R.string.sign_up_button),
             onClick = {
-                if (viewModel.signUp()) {
-                    Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
-                    onSignUpSuccess(
-                        uiState.id,
-                        uiState.password,
-                        uiState.nickname,
-                        uiState.email,
-                        uiState.age
-                    )
-                } else {
-                    Toast.makeText(context, "회원가입 실패했습니다.", Toast.LENGTH_SHORT).show()
-                }
+                viewModel.signUp(
+                    onSuccess = {
+                        Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
+                        onSignUpSuccess(
+                            uiState.id,
+                            uiState.password,
+                            uiState.nickname,
+                            uiState.email,
+                            uiState.age
+                        )
+                    },
+                    onError = { message ->
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
         )
     }
