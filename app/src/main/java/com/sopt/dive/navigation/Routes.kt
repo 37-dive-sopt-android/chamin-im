@@ -23,4 +23,6 @@ data class Home(
 data object Search : MainTabRoute
 
 @Serializable
-data object MyPage : MainTabRoute
+data class MyPage(
+    val userId: String = ""
+) : MainTabRoute

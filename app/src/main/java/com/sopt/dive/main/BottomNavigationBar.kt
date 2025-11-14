@@ -12,6 +12,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.toRoute
+import com.sopt.dive.navigation.Home
+import com.sopt.dive.navigation.MyPage
 import com.sopt.dive.ui.theme.Teel200
 import com.sopt.dive.ui.theme.Teel700
 
@@ -20,6 +24,17 @@ fun BottomNavigationBar(
     navController: NavHostController,
     currentDestination: NavDestination?
 ) {
+    val navBackStackEntry = navController.currentBackStackEntryAsState().value
+    val homeRoute = navBackStackEntry?.destination?.route?.let {
+        try {
+            navController.currentBackStackEntry?.toRoute<Home>()
+        } catch (e: Exception) {
+            null
+        }
+    }
+    // id
+    val currentUserId = homeRoute?.userId ?: ""
+
     NavigationBar(
         containerColor = Teel200,
         contentColor = Teel700
@@ -33,7 +48,13 @@ fun BottomNavigationBar(
                 icon = tab.icon,
                 onClick = {
                     if (!isSelected) {
-                        navController.navigate(tab.route) {
+                        val route = when (tab) {
+                            MainTab.HOME -> Home(userId = currentUserId)
+                            MainTab.MY -> MyPage(userId = currentUserId)
+                            else -> tab.route
+                        }
+
+                        navController.navigate(route) {
                             launchSingleTop = true
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true

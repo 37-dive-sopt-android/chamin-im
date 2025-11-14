@@ -28,7 +28,7 @@ enum class MainTab(
     ),
     MY(
         icon = Icons.Default.Person,
-        route = MyPage,
+        route = MyPage(),
         label = "마이"
     );
 

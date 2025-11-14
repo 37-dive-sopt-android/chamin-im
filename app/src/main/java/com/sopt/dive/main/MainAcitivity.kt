@@ -7,9 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -27,13 +24,6 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
-
-                // 사용자 정보를 저장할 상태
-                var currentUserId by remember { mutableStateOf("") }
-                var currentUserPw by remember { mutableStateOf("") }
-                var currentUserNickname by remember { mutableStateOf("") }
-                var currentUserEmail by remember { mutableStateOf("") }
-                var currentUserAge by remember { mutableStateOf("") }
 
                 val showBottomBar = currentDestination?.let { destination ->
                     MainTab.contains { route ->
@@ -54,19 +44,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     DiveNavHost(
                         navController = navController,
-                        paddingValues = innerPadding,
-                        userId = currentUserId,
-                        userPw = currentUserPw,
-                        userNickname = currentUserNickname,
-                        userEmail = currentUserEmail,
-                        userAge = currentUserAge,
-                        onUserInfoChanged = { userId, userPw, nickname, email, age ->
-                            currentUserId = userId
-                            currentUserPw = userPw
-                            currentUserNickname = nickname
-                            currentUserEmail = email
-                            currentUserAge = age
-                        }
+                        paddingValues = innerPadding
                     )
                 }
             }
