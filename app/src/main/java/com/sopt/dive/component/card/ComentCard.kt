@@ -63,7 +63,7 @@ fun CommentCard(
             Spacer(Modifier.width(4.dp))
 
             Text(
-                text = commentData.comments,
+                text = commentData.comment,
                 fontSize = 13.sp,
                 color = Color.Gray
             )
