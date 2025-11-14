@@ -7,12 +7,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.sopt.dive.home.HomeScreen
-import com.sopt.dive.login.LoginResult
 import com.sopt.dive.login.LoginScreen
 import com.sopt.dive.my.MyScreen
 import com.sopt.dive.search.SearchScreen
@@ -29,8 +27,6 @@ fun DiveNavHost(
     userAge: String,
     onUserInfoChanged: (String, String, String, String, String) -> Unit
 ) {
-    val context = LocalContext.current
-
     // 회원가입 정보를 저장할 상태
     var signUpId by remember { mutableStateOf("") }
     var signUpPw by remember { mutableStateOf("") }
@@ -45,44 +41,19 @@ fun DiveNavHost(
     ) {
         composable<Login> {
             LoginScreen(
-                signUpId = signUpId,
-                signUpPw = signUpPw,
                 onSignUpClick = {
                     navController.navigate(SignUp)
                 },
-                onLoginClick = { _, _ -> },
-                onLoginResult = { result ->
-                    when (result) {
-                        is LoginResult.Success -> {
-                            Toast.makeText(
-                                context,
-                                "로그인 성공! ${signUpNickname}님 환영합니다.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            onUserInfoChanged(signUpId, signUpPw, signUpNickname, signUpEmail, signUpAge)
-                            navController.navigate(
-                                Home(
-                                    userId = signUpId,
-                                    nickname = signUpNickname
-                                )
-                            ) {
-                                popUpTo(Login) { inclusive = true }
-                            }
-                        }
-                        is LoginResult.NoSignUp -> {
-                            Toast.makeText(
-                                context,
-                                "먼저 회원가입을 해주세요.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        is LoginResult.InvalidCredentials -> {
-                            Toast.makeText(
-                                context,
-                                "아이디 또는 비밀번호가 일치하지 않습니다.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                onLoginSuccess = { userId, nickname ->
+                    // 로그인 성공 시 사용자 정보 업데이트 및 Home으로 이동
+                    onUserInfoChanged(signUpId, signUpPw, nickname, signUpEmail, signUpAge)
+                    navController.navigate(
+                        Home(
+                            userId = userId.toString(),
+                            nickname = nickname
+                        )
+                    ) {
+                        popUpTo(Login) { inclusive = true }
                     }
                 }
             )
@@ -97,8 +68,6 @@ fun DiveNavHost(
                     signUpNickname = nickname
                     signUpEmail = email
                     signUpAge = age
-
-                    Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
 
                     navController.popBackStack()
                 }

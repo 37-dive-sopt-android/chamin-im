@@ -1,5 +1,6 @@
 package com.sopt.dive.login
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -28,12 +30,10 @@ import com.sopt.dive.ui.component.button.DiveButton
 fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = viewModel(),
-    signUpId: String = "",
-    signUpPw: String = "",
     onSignUpClick: () -> Unit,
-    onLoginClick: (id: String, pw: String) -> Unit,
-    onLoginResult: (LoginResult) -> Unit
+    onLoginSuccess: (userId: Long, username: String) -> Unit
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
@@ -42,14 +42,11 @@ fun LoginScreen(
             .padding(horizontal = 20.dp, vertical = 50.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
-        // 제목
         DiveTitle(text = stringResource(R.string.welcome_title))
 
         Spacer(Modifier.height(50.dp))
 
-        // 입력 필드들
         Column {
-            // ID 입력
             DiveTextField(
                 label = stringResource(R.string.id_label),
                 value = uiState.id,
@@ -60,7 +57,6 @@ fun LoginScreen(
 
             Spacer(Modifier.height(20.dp))
 
-            // 비밀번호 입력
             DiveTextField(
                 label = stringResource(R.string.password_label),
                 value = uiState.password,
@@ -71,22 +67,27 @@ fun LoginScreen(
             )
         }
 
-        Spacer(Modifier.weight(1f))  // 남은 공간을 모두 차지
+        Spacer(Modifier.weight(1f))
 
-        // 로그인 버튼
         DiveButton(
             text = stringResource(R.string.login_button),
             onClick = {
-                val result = viewModel.validateLogin(signUpId, signUpPw)
-                onLoginResult(result)
-
-                if (result is LoginResult.Success) {
-                    onLoginClick(uiState.id, uiState.password)
-                }
+                viewModel.login(
+                    onSuccess = { userId, username ->
+                        Toast.makeText(
+                            context,
+                            "로그인 성공! ${username}님 환영합니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onLoginSuccess(userId, username)
+                    },
+                    onError = { message ->
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
         )
 
-        // 회원가입 링크
         Text(
             text = stringResource(R.string.sign_up_link),
             textDecoration = TextDecoration.Underline,
@@ -103,7 +104,6 @@ private fun Preview() {
     LoginScreen(
         modifier = Modifier.fillMaxSize(),
         onSignUpClick = {},
-        onLoginClick = { ckals413, aaaaaaaa -> },
-        onLoginResult = {}
+        onLoginSuccess = { _, _ -> }
     )
 }
