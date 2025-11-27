@@ -3,8 +3,10 @@ package com.sopt.dive.login
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.sopt.dive.data.ServicePool
-import com.sopt.dive.data.dto.request.RequestLoginDto
-import com.sopt.dive.data.dto.response.ResponseLoginDto
+import com.sopt.dive.data.dto.request.LoginRequestDto
+import com.sopt.dive.data.dto.response.BaseResponse
+import com.sopt.dive.data.dto.response.LoginData
+import com.sopt.dive.util.LoginValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,25 +40,24 @@ class LoginViewModel : ViewModel() {
         val currentState = _uiState.value
 
         // 입력값 검증
-        if (currentState.id.isEmpty()) {
-            onError("아이디를 입력해주세요.")
-            return
-        }
-        if (currentState.password.isEmpty()) {
-            onError("비밀번호를 입력해주세요.")
+        if (!LoginValidator.isAllValid(currentState.id, currentState.password)) {
+            val idError = LoginValidator.validateId(currentState.id)
+            val passwordError = LoginValidator.validatePassword(currentState.password)
+
+            onError(idError.ifEmpty { passwordError })
             return
         }
 
         // API 요청
-        val request = RequestLoginDto(
+        val request = LoginRequestDto(
             username = currentState.id,
             password = currentState.password
         )
 
-        authService.login(request).enqueue(object : Callback<ResponseLoginDto> {
+        authService.login(request).enqueue(object : Callback<BaseResponse<LoginData>> {
             override fun onResponse(
-                call: Call<ResponseLoginDto>,
-                response: Response<ResponseLoginDto>
+                call: Call<BaseResponse<LoginData>>,
+                response: Response<BaseResponse<LoginData>>
             ) {
                 if (response.isSuccessful) {
                     val body = response.body()
@@ -81,16 +82,10 @@ class LoginViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<ResponseLoginDto>, t: Throwable) {
+            override fun onFailure(call: Call<BaseResponse<LoginData>>, t: Throwable) {
                 Log.e("Login", "Network Error: ${t.message}")
                 onError("네트워크 오류가 발생했습니다.")
             }
         })
     }
-}
-
-sealed class LoginResult {
-    object Success : LoginResult()
-    object NoSignUp : LoginResult()
-    object InvalidCredentials : LoginResult()
 }

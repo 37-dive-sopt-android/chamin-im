@@ -6,7 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
 import com.sopt.dive.R
 import com.sopt.dive.data.ServicePool
-import com.sopt.dive.data.dto.response.ResponseUserDto
+import com.sopt.dive.data.dto.response.BaseResponse
+import com.sopt.dive.data.dto.response.ProfileResponseDto
 import com.sopt.dive.my.data.UserProfile
 import com.sopt.dive.navigation.MyPage
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,10 +46,10 @@ class MyViewModel(
 
         _uiState.update { it.copy(isLoading = true) }
 
-        authService.getUserInfo(userId).enqueue(object : Callback<ResponseUserDto> {
+        authService.getUserInfo(userId).enqueue(object : Callback<BaseResponse<ProfileResponseDto>> {
             override fun onResponse(
-                call: Call<ResponseUserDto>,
-                response: Response<ResponseUserDto>
+                call: Call<BaseResponse<ProfileResponseDto>>,
+                response: Response<BaseResponse<ProfileResponseDto>>
             ) {
                 if (response.isSuccessful) {
                     val body = response.body()
@@ -58,7 +59,7 @@ class MyViewModel(
                             currentState.copy(
                                 userProfile = UserProfile(
                                     id = body.data.id,
-                                    username = body.data.username,
+                                    username = body.data.userName,
                                     name = body.data.name,
                                     email = body.data.email,
                                     age = body.data.age.toString(),
@@ -95,7 +96,7 @@ class MyViewModel(
                 }
             }
 
-            override fun onFailure(call: Call<ResponseUserDto>, t: Throwable) {
+            override fun onFailure(call: Call<BaseResponse<ProfileResponseDto>>, t: Throwable) {
                 Log.e("MyScreen", "Network Error: ${t.message}")
                 _uiState.update { currentState ->
                     currentState.copy(

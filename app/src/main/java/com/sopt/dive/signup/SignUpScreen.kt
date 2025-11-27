@@ -22,16 +22,66 @@ import com.sopt.dive.component.textfield.DiveTextField
 import com.sopt.dive.ui.component.button.DiveButton
 import com.sopt.dive.ui.theme.DiveTheme
 
-
 @Composable
-fun SignUpScreen(
+fun SignUpRoute(
     modifier: Modifier = Modifier,
     viewModel: SignUpViewModel = viewModel(),
-    onSignUpSuccess: (String, String, String, String, String) -> Unit = { _, _, _, _, _ -> }
+    navigateToLogin: () -> Unit
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    SignUpScreen(
+        modifier = modifier,
+        id = uiState.id,
+        password = uiState.password,
+        nickname = uiState.nickname,
+        email = uiState.email,
+        age = uiState.age,
+        idError = uiState.idError,
+        passwordError = uiState.passwordError,
+        nicknameError = uiState.nicknameError,
+        emailError = uiState.emailError,
+        ageError = uiState.ageError,
+        onIdChange = viewModel::updateId,
+        onPasswordChange = viewModel::updatePassword,
+        onNicknameChange = viewModel::updateNickname,
+        onEmailChange = viewModel::updateEmail,
+        onAgeChange = viewModel::updateAge,
+        onSignUpClick = {
+            viewModel.signUp(
+                onSuccess = {
+                    Toast.makeText(context, "회원가입 성공!", Toast.LENGTH_SHORT).show()
+                    navigateToLogin()
+                },
+                onError = { message ->
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+    )
+}
+
+@Composable
+private fun SignUpScreen(
+    modifier: Modifier = Modifier,
+    id: String,
+    password: String,
+    nickname: String,
+    email: String,
+    age: String,
+    idError: String,
+    passwordError: String,
+    nicknameError: String,
+    emailError: String,
+    ageError: String,
+    onIdChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onNicknameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onAgeChange: (String) -> Unit,
+    onSignUpClick: () -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -48,49 +98,49 @@ fun SignUpScreen(
             DiveTextField(
                 label = stringResource(R.string.id_label),
                 placeholder = stringResource(R.string.id_placeholder),
-                value = uiState.id,
-                onValueChange = viewModel::updateId,
-                errorMessage = uiState.idError
+                value = id,
+                onValueChange = onIdChange,
+                errorMessage = idError
             )
 
             Spacer(Modifier.height(20.dp))
 
             DiveTextField(
                 label = stringResource(R.string.pw_label),
-                value = uiState.password,
-                onValueChange = viewModel::updatePassword,
+                value = password,
+                onValueChange = onPasswordChange,
                 placeholder = stringResource(R.string.pw_placeholder),
-                errorMessage = uiState.passwordError
+                errorMessage = passwordError
             )
 
             Spacer(Modifier.height(20.dp))
 
             DiveTextField(
                 label = stringResource(R.string.nickname_label),
-                value = uiState.nickname,
-                onValueChange = viewModel::updateNickname,
+                value = nickname,
+                onValueChange = onNicknameChange,
                 placeholder = stringResource(R.string.nickname_placeholder),
-                errorMessage = uiState.nicknameError
+                errorMessage = nicknameError
             )
 
             Spacer(Modifier.height(20.dp))
 
             DiveTextField(
                 label = stringResource(R.string.email_label),
-                value = uiState.email,
-                onValueChange = viewModel::updateEmail,
+                value = email,
+                onValueChange = onEmailChange,
                 placeholder = stringResource(R.string.email_placeholder),
-                errorMessage = uiState.emailError
+                errorMessage = emailError
             )
 
             Spacer(Modifier.height(20.dp))
 
             DiveTextField(
                 label = stringResource(R.string.age_label),
-                value = uiState.age,
-                onValueChange = viewModel::updateAge,
+                value = age,
+                onValueChange = onAgeChange,
                 placeholder = stringResource(R.string.age_placeholder),
-                errorMessage = uiState.ageError
+                errorMessage = ageError
             )
         }
 
@@ -99,31 +149,32 @@ fun SignUpScreen(
         // 회원가입 버튼
         DiveButton(
             text = stringResource(R.string.sign_up_button),
-            onClick = {
-                viewModel.signUp(
-                    onSuccess = {
-                        Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
-                        onSignUpSuccess(
-                            uiState.id,
-                            uiState.password,
-                            uiState.nickname,
-                            uiState.email,
-                            uiState.age
-                        )
-                    },
-                    onError = { message ->
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    }
-                )
-            }
+            onClick = onSignUpClick
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun SignUpScreenPreview() {
+private fun SignUpScreenPreview() {
     DiveTheme {
-        SignUpScreen(Modifier.fillMaxSize())
+        SignUpScreen(
+            id = "",
+            password = "",
+            nickname = "",
+            email = "",
+            age = "",
+            idError = "",
+            passwordError = "",
+            nicknameError = "",
+            emailError = "",
+            ageError = "",
+            onIdChange = {},
+            onPasswordChange = {},
+            onNicknameChange = {},
+            onEmailChange = {},
+            onAgeChange = {},
+            onSignUpClick = {}
+        )
     }
 }

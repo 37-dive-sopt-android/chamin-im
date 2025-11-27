@@ -3,8 +3,8 @@ package com.sopt.dive.signup
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.sopt.dive.data.ServicePool
-import com.sopt.dive.data.dto.request.RequestSignUpDto
-import com.sopt.dive.data.dto.response.ResponseSignUpDto
+import com.sopt.dive.data.dto.request.SignUpRequestDto
+import com.sopt.dive.data.dto.response.BaseResponse
 import com.sopt.dive.util.SignUpValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -94,19 +94,26 @@ class SignUpViewModel : ViewModel() {
             return
         }
 
+        val ageInt = currentState.age.toIntOrNull()
+        if (ageInt == null || ageInt <= 0) {
+            Log.e("SignUp", "나이 변환 실패 또는 0 이하: age=$ageInt")
+            onError("나이를 올바르게 입력해주세요.")
+            return
+        }
+
         // API 요청
-        val request = RequestSignUpDto(
+        val request = SignUpRequestDto(
             username = currentState.id,
             password = currentState.password,
             name = currentState.nickname,
             email = currentState.email,
-            age = currentState.age.toIntOrNull() ?: 0
+            age = ageInt
         )
 
-        authService.signUp(request).enqueue(object : Callback<ResponseSignUpDto> {
+        authService.signUp(request).enqueue(object : Callback<BaseResponse<Unit>> {
             override fun onResponse(
-                call: Call<ResponseSignUpDto>,
-                response: Response<ResponseSignUpDto>
+                call: Call<BaseResponse<Unit>>,
+                response: Response<BaseResponse<Unit>>
             ) {
                 if (response.isSuccessful) {
                     val body = response.body()
@@ -129,7 +136,7 @@ class SignUpViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<ResponseSignUpDto>, t: Throwable) {
+            override fun onFailure(call: Call<BaseResponse<Unit>>, t: Throwable) {
                 Log.e("SignUp", "Network Error: ${t.message}")
                 onError("네트워크 오류가 발생했습니다.")
             }

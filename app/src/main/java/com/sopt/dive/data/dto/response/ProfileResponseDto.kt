@@ -4,23 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ResponseUserDto(
-    @SerialName("success")
-    val success: Boolean,
-    @SerialName("code")
-    val code: String,
-    @SerialName("message")
-    val message: String,
-    @SerialName("data")
-    val data: UserData?
-)
-
-@Serializable
-data class UserData(
+data class ProfileResponseDto(
     @SerialName("id")
     val id: Long,
     @SerialName("username")
-    val username: String,
+    val userName: String,
     @SerialName("name")
     val name: String,
     @SerialName("email")

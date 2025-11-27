@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,17 +26,55 @@ import com.sopt.dive.component.text.DiveTitle
 import com.sopt.dive.component.textfield.DiveTextField
 import com.sopt.dive.ui.component.button.DiveButton
 
-
 @Composable
-fun LoginScreen(
+fun LoginRoute(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = viewModel(),
-    onSignUpClick: () -> Unit,
-    onLoginSuccess: (userId: Long, username: String) -> Unit
+    navigateToSignUp: () -> Unit,
+    navigateToHome: (userId: Long, username: String) -> Unit
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LoginScreen(
+        modifier = modifier,
+        id = uiState.id,
+        password = uiState.password,
+        idError = uiState.idError,
+        passwordError = uiState.passwordError,
+        onIdChange = viewModel::updateId,
+        onPasswordChange = viewModel::updatePassword,
+        onSignUpClick = navigateToSignUp,
+        onLoginClick = {
+            viewModel.login(
+                onSuccess = { userId, username ->
+                    Toast.makeText(
+                        context,
+                        "로그인 성공! ${username}님 환영합니다.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    navigateToHome(userId, username)
+                },
+                onError = { message ->
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+    )
+}
+
+@Composable
+private fun LoginScreen(
+    modifier: Modifier = Modifier,
+    id: String,
+    password: String,
+    idError: String,
+    passwordError: String,
+    onIdChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onSignUpClick: () -> Unit,
+    onLoginClick: () -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -49,20 +88,20 @@ fun LoginScreen(
         Column {
             DiveTextField(
                 label = stringResource(R.string.id_label),
-                value = uiState.id,
-                onValueChange = viewModel::updateId,
+                value = id,
+                onValueChange = onIdChange,
                 placeholder = stringResource(R.string.id_placeholder),
-                errorMessage = uiState.idError
+                errorMessage = idError
             )
 
             Spacer(Modifier.height(20.dp))
 
             DiveTextField(
                 label = stringResource(R.string.password_label),
-                value = uiState.password,
-                onValueChange = viewModel::updatePassword,
+                value = password,
+                onValueChange = onPasswordChange,
                 placeholder = stringResource(R.string.pw_placeholder),
-                errorMessage = uiState.passwordError,
+                errorMessage = passwordError,
                 visualTransformation = PasswordVisualTransformation()
             )
         }
@@ -71,21 +110,7 @@ fun LoginScreen(
 
         DiveButton(
             text = stringResource(R.string.login_button),
-            onClick = {
-                viewModel.login(
-                    onSuccess = { userId, username ->
-                        Toast.makeText(
-                            context,
-                            "로그인 성공! ${username}님 환영합니다.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        onLoginSuccess(userId, username)
-                    },
-                    onError = { message ->
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    }
-                )
-            }
+            onClick = onLoginClick
         )
 
         Text(
@@ -100,10 +125,15 @@ fun LoginScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun Preview() {
+private fun LoginScreenPreview() {
     LoginScreen(
-        modifier = Modifier.fillMaxSize(),
+        id = "",
+        password = "",
+        idError = "",
+        passwordError = "",
+        onIdChange = {},
+        onPasswordChange = {},
         onSignUpClick = {},
-        onLoginSuccess = { _, _ -> }
+        onLoginClick = {}
     )
 }
