@@ -5,7 +5,6 @@ import com.sopt.dive.data.dto.request.SignUpRequestDto
 import com.sopt.dive.data.dto.response.BaseResponse
 import com.sopt.dive.data.dto.response.LoginData
 import com.sopt.dive.data.dto.response.ProfileResponseDto
-import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -13,17 +12,17 @@ import retrofit2.http.Path
 
 interface AuthService {
     @POST("/api/v1/users")
-    fun signUp(
+    suspend fun signUp(
         @Body request: SignUpRequestDto
-    ): Call<BaseResponse<Unit>>
+    ): BaseResponse<Unit>
 
     @POST("/api/v1/auth/login")
-    fun login(
+    suspend fun login(
         @Body request: LoginRequestDto
-    ): Call<BaseResponse<LoginData>>
+    ): BaseResponse<LoginData>
 
     @GET("/api/v1/users/{id}")
-    fun getUserInfo(
+    suspend fun getUserInfo(
         @Path("id") userId: Long
-    ): Call<BaseResponse<ProfileResponseDto>>
+    ): BaseResponse<ProfileResponseDto>
 }

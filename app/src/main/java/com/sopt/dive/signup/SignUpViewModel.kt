@@ -2,17 +2,15 @@ package com.sopt.dive.signup
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sopt.dive.data.ServicePool
 import com.sopt.dive.data.dto.request.SignUpRequestDto
-import com.sopt.dive.data.dto.response.BaseResponse
 import com.sopt.dive.util.SignUpValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
 
 class SignUpViewModel : ViewModel() {
     private val authService by lazy { ServicePool.authService }
@@ -102,44 +100,30 @@ class SignUpViewModel : ViewModel() {
         }
 
         // API 요청
-        val request = SignUpRequestDto(
-            username = currentState.id,
-            password = currentState.password,
-            name = currentState.nickname,
-            email = currentState.email,
-            age = ageInt
-        )
+        viewModelScope.launch {
+            try {
+                val request = SignUpRequestDto(
+                    username = currentState.id,
+                    password = currentState.password,
+                    name = currentState.nickname,
+                    email = currentState.email,
+                    age = ageInt
+                )
 
-        authService.signUp(request).enqueue(object : Callback<BaseResponse<Unit>> {
-            override fun onResponse(
-                call: Call<BaseResponse<Unit>>,
-                response: Response<BaseResponse<Unit>>
-            ) {
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body?.success == true && body.data != null) {
-                        Log.d("SignUp", "회원가입 성공: ${body.data}")
-                        onSuccess()
-                    } else {
-                        Log.e("SignUp", "회원가입 실패: ${body?.message}")
-                        onError(body?.message ?: "회원가입에 실패했습니다.")
-                    }
+                // suspend 함수 호출
+                val response = authService.signUp(request)
+
+                if (response.success) {
+                    Log.d("SignUp", "회원가입 성공")
+                    onSuccess()
                 } else {
-                    val errorMessage = when (response.code()) {
-                        400 -> "요청 값이 유효하지 않습니다."
-                        409 -> "이미 존재하는 사용자명입니다."
-                        415 -> "지원하지 않는 콘텐츠 타입입니다."
-                        else -> "회원가입에 실패했습니다."
-                    }
-                    Log.e("SignUp", "Response Error: ${response.code()} - ${response.message()}")
-                    onError(errorMessage)
+                    Log.e("SignUp", "회원가입 실패: ${response.message}")
+                    onError(response.message)
                 }
-            }
-
-            override fun onFailure(call: Call<BaseResponse<Unit>>, t: Throwable) {
-                Log.e("SignUp", "Network Error: ${t.message}")
+            } catch (e: Exception) {
+                Log.e("SignUp", "Network Error: ${e.message}")
                 onError("네트워크 오류가 발생했습니다.")
             }
-        })
+        }
     }
 }
