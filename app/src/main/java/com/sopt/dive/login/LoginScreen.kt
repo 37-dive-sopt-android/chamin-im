@@ -35,6 +35,26 @@ fun LoginRoute(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val loginState by viewModel.loginState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(loginState) {
+        when (val state = loginState) {
+            is LoginState.Success -> {
+                Toast.makeText(
+                    context,
+                    "로그인 성공! ${state.username}님 환영합니다.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigateToHome(state.userId, state.username)
+                viewModel.resetLoginState()
+            }
+            is LoginState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                viewModel.resetLoginState()
+            }
+            LoginState.Idle -> Unit
+        }
+    }
 
     LoginScreen(
         modifier = modifier,
@@ -45,21 +65,7 @@ fun LoginRoute(
         onIdChange = viewModel::updateId,
         onPasswordChange = viewModel::updatePassword,
         onSignUpClick = navigateToSignUp,
-        onLoginClick = {
-            viewModel.login(
-                onSuccess = { userId, username ->
-                    Toast.makeText(
-                        context,
-                        "로그인 성공! ${username}님 환영합니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    navigateToHome(userId, username)
-                },
-                onError = { message ->
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                }
-            )
-        }
+        onLoginClick = { viewModel.login()}
     )
 }
 

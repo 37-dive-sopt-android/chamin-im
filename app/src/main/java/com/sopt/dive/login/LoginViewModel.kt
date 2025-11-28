@@ -18,6 +18,9 @@ class LoginViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
+    private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
+    val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+
     fun updateId(id: String) {
         _uiState.update { currentState ->
             currentState.copy(id = id)
@@ -30,18 +33,14 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun login(
-        onSuccess: (userId: Long, username: String) -> Unit,
-        onError: (String) -> Unit
-    ) {
+       fun login() {
         val currentState = _uiState.value
 
         // 입력값 검증
         if (!LoginValidator.isAllValid(currentState.id, currentState.password)) {
             val idError = LoginValidator.validateId(currentState.id)
             val passwordError = LoginValidator.validatePassword(currentState.password)
-
-            onError(idError.ifEmpty { passwordError })
+            _loginState.value = LoginState.Error(idError.ifEmpty { passwordError })
             return
         }
 
@@ -58,15 +57,25 @@ class LoginViewModel : ViewModel() {
 
                 if (response.success && response.data != null) {
                     Log.d("Login", "로그인 성공: ${response.data}")
-                    onSuccess(response.data.userId, currentState.id)
+                    _loginState.value = LoginState.Success(response.data.userId, currentState.id)
                 } else {
                     Log.e("Login", "로그인 실패: ${response.message}")
-                    onError(response.message)
+                    _loginState.value = LoginState.Error(response.message)
                 }
             } catch (e: Exception) {
                 Log.e("Login", "Network Error: ${e.message}")
-                onError("네트워크 오류가 발생했습니다.")
+                _loginState.value = LoginState.Error("네트워크 오류가 발생했습니다.")
             }
         }
     }
+
+    fun resetLoginState() {
+        _loginState.value = LoginState.Idle
+    }
+}
+
+sealed interface LoginState {
+    data object Idle : LoginState
+    data class Success(val userId: Long, val username: String) : LoginState
+    data class Error(val message: String) : LoginState
 }
