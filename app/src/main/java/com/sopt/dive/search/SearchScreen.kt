@@ -43,7 +43,7 @@ import com.sopt.dive.ui.theme.Teel200
 import com.sopt.dive.ui.theme.Teel700
 
 enum class CardFace {
-    Front, Back
+    FRONT, BACK
 }
 
 enum class FlipDirection {
@@ -55,7 +55,7 @@ fun SearchScreen(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    var currentFace by remember { mutableStateOf(CardFace.Front) }
+    var currentFace by remember { mutableStateOf(CardFace.FRONT) }
     var flipDirection by remember { mutableStateOf(FlipDirection.Horizontal) }
 
     Column(
@@ -72,8 +72,8 @@ fun SearchScreen(
             flipDirection = flipDirection,
             onClick = {
                 currentFace = when (currentFace) {
-                    CardFace.Front -> CardFace.Back
-                    CardFace.Back -> CardFace.Front
+                    CardFace.FRONT -> CardFace.BACK
+                    CardFace.BACK -> CardFace.FRONT
                 }
             },
             modifier = Modifier.size(350.dp)
@@ -91,8 +91,8 @@ fun SearchScreen(
                     flipDirection = FlipDirection.Horizontal
                     // 바로 뒤집기
                     currentFace = when (currentFace) {
-                        CardFace.Front -> CardFace.Back
-                        CardFace.Back -> CardFace.Front
+                        CardFace.FRONT -> CardFace.BACK
+                        CardFace.BACK -> CardFace.FRONT
                     }
                 },
                 modifier = Modifier.weight(1f)
@@ -105,8 +105,8 @@ fun SearchScreen(
                     flipDirection = FlipDirection.Vertical
                     // 바로 뒤집기
                     currentFace = when (currentFace) {
-                        CardFace.Front -> CardFace.Back
-                        CardFace.Back -> CardFace.Front
+                        CardFace.FRONT -> CardFace.BACK
+                        CardFace.BACK -> CardFace.FRONT
                     }
                 },
                 modifier = Modifier.weight(1f)
@@ -138,8 +138,8 @@ fun FlippableCard(
         label = "rotation"
     ) { face ->
         when (face) {
-            CardFace.Front -> 0f
-            CardFace.Back -> 180f
+            CardFace.FRONT -> 0f
+            CardFace.BACK -> 180f
         }
     }
 

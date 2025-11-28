@@ -1,17 +1,26 @@
 package com.sopt.dive.my
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sopt.dive.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sopt.dive.component.card.ProfileCard
 import com.sopt.dive.component.info.InfoItem
 import com.sopt.dive.ui.theme.DiveTheme
@@ -20,71 +29,101 @@ import com.sopt.dive.ui.theme.DiveTheme
 @Composable
 fun MyScreen(
     paddingValues: PaddingValues,
-    userId: String,
-    userPw: String,
-    nickname: String,
-    drink: String,
     modifier: Modifier = Modifier,
+    viewModel: MyViewModel = viewModel()
+) {
+    // 상태 구독
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        contentAlignment = Alignment.Center
+    ) {
+        when {
+            uiState.isLoading -> {
+                // TODO: 로딩
+            }
+            uiState.error != null -> {
+                Text(
+                    text = uiState.error ?: "오류가 발생했습니다.",
+                    color = Color.Red,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            else -> {
+                MyScreenContent(uiState = uiState)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MyScreenContent(
+    uiState: MyUiState,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(paddingValues)
-            .padding(horizontal = 20.dp, vertical = 50.dp),
+            .padding(horizontal = 20.dp, vertical = 50.dp)
     )
     {
         // 프로필 카드
         ProfileCard(
-            name = nickname,
-            description = "37기 안드로이드 YB 입니다!!",
-            profileImageRes = R.drawable.profile_image
+            name = uiState.userProfile.name,
+            description = uiState.userProfile.description,
+            profileImageRes = uiState.userProfile.profileImageRes
         )
 
         Spacer(Modifier.height(50.dp))
 
         // 사용자 정보 섹션
         UserInfoSection(
-            userId = userId,
-            userPw = userPw,
-            userNickname = nickname,
-            userDrink = drink
+            username = uiState.userProfile.username,
+            name = uiState.userProfile.name,
+            email = uiState.userProfile.email,
+            age = uiState.userProfile.age
         )
     }
 }
 
 @Composable
 private fun UserInfoSection(
-    userId: String,
-    userPw: String,
-    userNickname: String,
-    userDrink: String,
+    username: String,
+    name: String,
+    email: String,
+    age: String,
     modifier: Modifier = Modifier
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = modifier.padding(30.dp)
     ) {
-        // ID
+        // USERNAME - ID - 네이밍 애매..
         InfoItem(
-            label = "ID",
-            value = userId
+            label = "USERNAME",
+            value = username
         )
 
+        // NAME (nickname)
         InfoItem(
-            label = "PW",
-            value = userPw
+            label = "NAME",
+            value = name
         )
 
-        // NICKNAME
+        // Email
         InfoItem(
-            label = "NICKNAME",
-            value = userNickname
+            label = "EMAIL",
+            value = email
         )
 
-        // 주량
+        // Age
         InfoItem(
-            label = "주량",
-            value = if (userDrink.isNotEmpty()) "${userDrink}병" else "-"
+            label = "AGE",
+            value = age
         )
     }
 }
@@ -94,11 +133,7 @@ private fun UserInfoSection(
 private fun MyScreenPreview() {
     DiveTheme {
         MyScreen(
-            paddingValues = PaddingValues(0.dp),
-            userId = "testId",
-            userPw = "testPassword",
-            nickname = "테스트차민",
-            drink = "1"
+            paddingValues = PaddingValues(0.dp)
         )
     }
 }
